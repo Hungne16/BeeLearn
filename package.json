@@ -1,0 +1,13 @@
+{
+  "name": "beelearn",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "node test.mjs && node game-test.mjs"
+  },
+  "engines": { "node": ">=22" },
+  "devDependencies": { "typescript": "5.9.3" }
+}

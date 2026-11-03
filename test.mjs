@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict';
+import {schedule,parseCSV,dayKey} from './dist/model.js';
+const now=1800000000000;
+let r=schedule(undefined,true,now);assert.equal(r.interval,1);assert.equal(r.due,now+86400000);
+r=schedule(r,true,now);assert.equal(r.interval,3);
+r=schedule(r,true,now);assert.equal(r.interval,7);
+for(let i=0;i<9;i++)r=schedule(r,true,now);assert.equal(r.interval,90);
+r=schedule(r,false,now);assert.equal(r.streak,0);assert.equal(r.remembered,false);assert.equal(r.failures,1);assert.equal(r.due,now+600000);
+r=schedule(r,true,now);assert.equal(r.interval,1);assert.equal(r.failures,1);
+assert.deepEqual(parseCSV('word,meaning\r\n"query","truy vấn, tìm kiếm"\r\n"a""b","line\nnext"'),[['word','meaning'],['query','truy vấn, tìm kiếm'],['a"b','line\nnext']]);
+assert.throws(()=>parseCSV('"unclosed'));
+assert.equal(dayKey(new Date(2026,10,4)),'2026-11-04');
+console.log('PASS: spaced repetition intervals, failure reset, cap, CSV commas/quotes/newlines, local day.');
