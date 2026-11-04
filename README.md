@@ -88,3 +88,13 @@ Kiểm tra quyền chủ sở hữu, chặn truy cập chéo, dữ liệu sai đ
 Thêm mục **Lớp học**: vai trò giáo viên/học sinh, tạo/tham gia/duyệt lớp, mã và link mời, giao bộ từ có thời hạn, bài riêng cho học sinh, dùng flashcard và hai game hiện có, thống kê/lịch sử kết quả, ôn từ khó và lưu trữ lớp. Học cá nhân vẫn độc lập.
 
 API máy chủ cần hai biến Firebase Admin trong Vercel; xem [CLASSROOM_SETUP.md](CLASSROOM_SETUP.md). Nếu chưa cấu hình, trang lớp học báo chưa kích hoạt; các chức năng học cá nhân vẫn hoạt động. Không mở quyền Firestore để thay thế API.
+
+## Luồng vào trang và dữ liệu tài khoản
+
+Khách thấy landing page; `#demo` dùng năm từ công khai và game có sẵn, chỉ giữ trong bộ nhớ. `#login`/`#register` dùng Google đăng nhập/đăng ký, có chuyển cảnh giữa hai chế độ. App trước đây chưa có form email/password hoặc hình ong riêng; giao diện mới bổ sung hai panel tương ứng và minh họa ong.
+
+Tài khoản mới luôn bắt đầu rỗng, không đọc `seed.json` và không tự nhập dữ liệu khách. Cache vẫn tách theo UID; tài khoản cũ giữ dữ liệu và hàng đợi. Dữ liệu cũ ở `nho-tu-v1` được giữ nguyên để chủ dữ liệu chủ động xác nhận nhập từ mục Tài khoản. Không xóa dữ liệu Firestore để xử lý lỗi seed.
+
+App hỗ trợ đường dẫn `/dashboard`, `/decks`, `/games`, `/classrooms`, `/assignments`, `/profile`, `/demo`, `/login`, `/register` và điều hướng hash tương ứng. Khách vào đường dẫn riêng được đưa đến đăng nhập; có trạng thái kiểm tra phiên và tải tài khoản. Onboarding rút gọn nằm ở dashboard trống và có thể mở lại bằng Tổng quan; nút lớp học theo vai trò đã lưu.
+
+Kiểm tra UI bằng Firebase Emulator: khách không thấy Day 1; cả hai demo game chạy; tạo A sau demo vẫn rỗng; A tạo bộ và học thẻ; đăng xuất về landing; B bắt đầu rỗng không thấy A; đăng nhập lại A khôi phục bộ và tiến độ; vai trò giáo viên vẫn có nút tạo lớp. Không tạo tài khoản thử trên project thật.

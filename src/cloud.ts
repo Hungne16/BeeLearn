@@ -32,14 +32,14 @@ export function createCloud(getState:()=>State,replace:(s:State)=>void,changed:(
  async function pull(){const token=epoch;if(!user||!cache)return;if(busy||cache.queue.length){needsPull=true;return}try{const s=await readCloud(db,user.uid);if(token!==epoch||busy||cache?.queue.length)return;cache!.state=s;baseline=clone(s);persist();replace(clone(s));status('Đã đồng bộ')}catch(e){status(error(e))}}
  onAuthStateChanged(auth,next=>{
   epoch++;unsub();clearTimeout(timer);user=next;ready=false;
-  if(!next){cache=null;baseline=guest();replace(clone(baseline));ready=true;status('Lưu trên máy');return}
-  try{const raw=JSON.parse(localStorage.getItem(key(next.uid))??'null');cache=raw&&valid(raw.state)&&Array.isArray(raw.queue)?raw:null}catch{cache=null}
-  cache??={state:guest(),queue:[],initialized:false};ready=cache.initialized;baseline=clone(cache.state);replace(clone(baseline));status('Đang kết nối…');
+  if(!next){cache=null;baseline=emptyState();ready=true;status('Chưa đăng nhập');replace(clone(baseline));return}
+  try{const raw=JSON.parse(localStorage.getItem(key(next.uid))??'null');cache=raw&&raw.initialized===true&&valid(raw.state)&&Array.isArray(raw.queue)?raw:null}catch{cache=null}
+  cache??={state:emptyState(),queue:[],initialized:false};ready=false;status('Đang kết nối…');baseline=clone(cache.state);replace(clone(baseline));
   void flush().then(()=>{if(user?.uid!==next.uid)return;void pull();unsub=onSnapshot(doc(db,'users',next.uid,'metadata','sync'),snap=>{if(snap.data()?.clientId!==clientId)void pull()},e=>status(error(e)))})
  });
  window.addEventListener('online',()=>void flush());window.addEventListener('offline',()=>status('Mất mạng · đã giữ trên máy'));
  return {
-  save(s:State){try{if(!user){localStorage.setItem('nho-tu-v1',JSON.stringify(s));baseline=clone(s);return}if(!cache)return;const p=createPatch(baseline,s,crypto.randomUUID());baseline=clone(s);cache.state=clone(s);if(hasChanges(p))cache.queue.push(p);persist();status('Đang chờ đồng bộ');clearTimeout(timer);timer=window.setTimeout(()=>void flush(),600)}catch{notify('Không lưu được trên máy. Hãy xuất bản sao lưu JSON.')}},
+  save(s:State){try{if(!user)return;if(!cache)return;const p=createPatch(baseline,s,crypto.randomUUID());baseline=clone(s);cache.state=clone(s);if(hasChanges(p))cache.queue.push(p);persist();status('Đang chờ đồng bộ');clearTimeout(timer);timer=window.setTimeout(()=>void flush(),600)}catch{notify('Không lưu được trên máy. Hãy xuất bản sao lưu JSON.')}},
   async login(){try{const provider=new GoogleAuthProvider();provider.setCustomParameters({prompt:'select_account'});await signInWithPopup(auth,provider)}catch(e){if(!String((e as {code?:string}).code).includes('popup-closed'))notify(error(e))}},
   async logout(){try{await signOut(auth)}catch(e){notify(error(e))}},
   retry(){void flush()},
