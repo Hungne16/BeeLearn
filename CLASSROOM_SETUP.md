@@ -63,3 +63,7 @@ node scripts/serve.mjs --emulator
 Mở `http://127.0.0.1:5181/?emulator=1`. Chế độ emulator của frontend chỉ được phép trên localhost; API chỉ bật emulator khi chạy local, không phải Vercel. Bài test xóa dữ liệu **chỉ trong Firestore Emulator demo-beelearn**, không đụng project thật.
 
 Đã kiểm tra: vai trò và token, quyền chủ lớp, chặn người ngoài, duyệt/tham gia trùng, giao riêng, giữ bản từ vựng, chống nộp trùng, từ ngoài đề, finish giả không có đáp án, độ chính xác không đạt, lịch sử riêng tư, đổi mã, gỡ thành viên, lưu trữ; toàn bộ kiểm tra học cá nhân/lịch ôn/game/giữ chuỗi vẫn chạy.
+
+## Ghi chú runtime
+
+Firebase Admin được ghim ở `13.6.0` để dùng chuỗi thư viện xác thực CommonJS tương thích với Vercel Node runtime. Khi nâng SDK, kiểm tra cả endpoint trên deployment thật; chỉ build TypeScript thành công chưa đủ để xác minh việc tải module trong Vercel.

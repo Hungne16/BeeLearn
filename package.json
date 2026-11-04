@@ -6,7 +6,7 @@
   "scripts": {
     "build": "node scripts/build.mjs",
     "typecheck": "tsc --noEmit",
-    "test": "node test.mjs && node game-test.mjs && node streak-test.mjs",
+    "test": "node test.mjs && node game-test.mjs && node streak-test.mjs && node classroom-startup-test.mjs",
     "test:firebase": "node firebase-test.mjs",
     "dev": "node scripts/serve.mjs",
     "test:classrooms": "node classroom-test.mjs"
@@ -21,6 +21,6 @@
   },
   "dependencies": {
     "firebase": "12.8.0",
-    "firebase-admin": "14.5.0"
+    "firebase-admin": "13.6.0"
   }
 }
