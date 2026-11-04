@@ -10,6 +10,9 @@
 - Tạo/sửa bộ từ, thêm từ và nhập CSV/JSON.
 - Lưu tiến độ, thống kê và bản sao lưu JSON.
 - Thanh điều hướng cố định trên mọi màn hình.
+- Nhịp học: lịch tháng, chuỗi hiện tại, kỷ lục, mốc 3/7/14/30/100 ngày và mục tiêu 10 lượt/ngày. Trả lời ít nhất 1 lượt/ngày (thẻ hoặc trò chơi) để giữ chuỗi; bỏ trọn một ngày sẽ bắt đầu chuỗi mới. Kỷ lục vẫn được giữ.
+- Nút chuỗi trên thanh đầu trang mở lịch từ mọi màn hình; các ngày trong lịch tuần mở chi tiết ngày. Thống kê chuỗi được tính từ lịch sử hoạt động đã đồng bộ Firebase, không cần lưu riêng.
+- Tạo/sửa/xóa bộ từ và thẻ, nhập CSV/JSON ngay cả khi thư viện trống, sao lưu/khôi phục có xác nhận trong web. Trò chơi tự tạm dừng khi mở hộp thoại.
 
 ## Chạy trên máy
 
@@ -40,7 +43,7 @@ Mở `http://localhost:8080`. Không mở `index.html` bằng đường dẫn `f
    - Output Directory: `dist`.
 4. Chọn Node.js 22.x hoặc mới hơn rồi Deploy.
 
-Đã cấu hình Firebase project `beelearn-1079b`; không cần biến môi trường để build. Sau khi deploy, thêm **đúng hostname Vercel** vào Firebase Console → Authentication → Settings → Authorized domains. Ví dụ hostname không chứa `https://` hoặc đường dẫn. Chưa thêm tên miền thì Google đăng nhập sẽ báo `unauthorized-domain`.
+Đã cấu hình Firebase project `beelearn-1079b`; không cần biến môi trường để build. Tên miền `beelearning-ten.vercel.app` đã được thêm vào Firebase Auth. Nếu đổi tên miền, thêm **đúng hostname mới** vào Firebase Console → Authentication → Settings → Authorized domains. Ví dụ hostname không chứa `https://` hoặc đường dẫn. Chưa thêm tên miền thì Google đăng nhập sẽ báo `unauthorized-domain`.
 
 ## Dữ liệu và Firebase
 

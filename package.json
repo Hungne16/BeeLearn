@@ -6,7 +6,7 @@
   "scripts": {
     "build": "node scripts/build.mjs",
     "typecheck": "tsc --noEmit",
-    "test": "node test.mjs && node game-test.mjs",
+    "test": "node test.mjs && node game-test.mjs && node streak-test.mjs",
     "test:firebase": "node firebase-test.mjs"
   },
   "engines": {

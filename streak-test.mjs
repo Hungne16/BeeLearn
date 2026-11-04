@@ -1,0 +1,18 @@
+import assert from 'node:assert/strict';
+import {streakStats,studyCelebration} from './dist/streak.js';
+const at=s=>new Date(s+'T12:00:00');
+assert.deepEqual(streakStats({},at('2026-11-04')),{current:0,best:0,days:0,today:0,secured:false,atRisk:false,yesterday:false,total:0});
+const active={'2026-11-02':3,'2026-11-03':5};
+assert.equal(streakStats(active,at('2026-11-04')).current,2);
+assert.equal(streakStats(active,at('2026-11-04')).atRisk,true);
+assert.equal(streakStats(active,at('2026-11-05')).current,0);
+assert.equal(streakStats(active,at('2026-11-05')).best,2);
+assert.equal(streakStats({...active,'2026-11-04':1},at('2026-11-04')).current,3);
+assert.equal(streakStats({'2025-12-31':1,'2026-01-01':1},at('2026-01-01')).current,2);
+assert.equal(streakStats({'2024-02-28':1,'2024-02-29':1,'2024-03-01':1},at('2024-03-01')).current,3);
+assert.equal(streakStats({'2026-03-07':1,'2026-03-08':1,'2026-03-09':1},at('2026-03-09')).current,3);
+assert.equal(streakStats({'2026-02-30':100,'2027-01-01':100,'bad':2,'2026-11-04':0},at('2026-11-04')).days,0);
+assert.match(studyCelebration(active,{...active,'2026-11-04':1},at('2026-11-04')),/3 ngày/);
+assert.equal(studyCelebration({'2026-11-04':1},{'2026-11-04':2},at('2026-11-04')),'');
+assert.match(studyCelebration({'2026-11-04':9},{'2026-11-04':10},at('2026-11-04')),/mục tiêu/);
+console.log('PASS: streak continuity, at-risk day, missed day, longest streak, year/leap/DST boundaries, invalid/future dates and one-time goal celebration.');
