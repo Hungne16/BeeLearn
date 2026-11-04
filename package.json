@@ -9,7 +9,8 @@
     "test": "node test.mjs && node game-test.mjs && node streak-test.mjs && node classroom-startup-test.mjs && node auth-test.mjs",
     "test:firebase": "node firebase-test.mjs",
     "dev": "node scripts/serve.mjs",
-    "test:classrooms": "node classroom-test.mjs"
+    "test:classrooms": "node classroom-test.mjs",
+    "test:profile": "node profile-test.mjs"
   },
   "engines": {
     "node": ">=22"

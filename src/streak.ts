@@ -1,7 +1,7 @@
 import {dayKey,type State} from './model.js';
 export const DAILY_GOAL=10;
-const offset=(date:Date,n:number)=>{const d=new Date(date);d.setHours(12,0,0,0);d.setDate(d.getDate()+n);return d};
-const serial=(key:string)=>{if(!/^\d{4}-\d{2}-\d{2}$/.test(key))return NaN;const [y,m,d]=key.split('-').map(Number);const date=new Date(y,m-1,d,12);return dayKey(date)===key?Date.UTC(y,m-1,d)/86400000:NaN};
+const offset=(date:Date,n:number)=>new Date(Date.parse(dayKey(date)+'T12:00:00+07:00')+n*86400000);
+const serial=(key:string)=>{if(!/^\d{4}-\d{2}-\d{2}$/.test(key))return NaN;const n=Date.parse(key+'T12:00:00Z');return Number.isFinite(n)&&new Date(n).toISOString().slice(0,10)===key?Math.floor(n/86400000):NaN};
 export function streakStats(activity:Record<string,number>,now=new Date()){
  const today=dayKey(now),yesterday=dayKey(offset(now,-1)),todayNumber=serial(today);
  const days=Object.keys(activity).filter(k=>activity[k]>0&&Number.isFinite(serial(k))&&serial(k)<=todayNumber).sort();

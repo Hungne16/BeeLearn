@@ -106,3 +106,15 @@ Hai form nằm trong cùng một scene SVG và cùng tồn tại trong DOM. Khun
 Email/password dùng Firebase Auth có thật: remember-me chọn local/session persistence; quên mật khẩu gọi email reset; đăng ký cập nhật tên và gọi API máy chủ để lưu vai trò. Không tự tạo bộ mẫu. Google vẫn có sẵn. Vai trò chưa gửi thành công được giữ riêng theo UID để thử lại khi đăng nhập; quyền lớp vẫn do máy chủ kiểm tra.
 
 Đã thử trên emulator: sai xác nhận mật khẩu, sai mật khẩu đăng nhập, đăng ký giáo viên, thư viện mới trống, vai trò đúng và đăng nhập lại với phiên tạm.
+
+## Hồ sơ cá nhân và điều hướng
+
+Thanh đầu trang giữ bốn mục Tổng quan, Học tập, Thư viện và Lớp học. Học tập chứa học thẻ, kiểm tra, ôn tập và trò chơi; menu ⋯ chứa nhập từ/sao lưu. Bấm avatar → **Hồ sơ cá nhân** để mở `/profile`. Menu tài khoản vẫn có đồng bộ và đăng xuất.
+
+Hồ sơ dùng API Firebase Admin hiện có, xác định chủ hồ sơ bằng token đăng nhập. `personalProfiles/<uid>` lưu tên, username duy nhất, giới thiệu tối đa 160 ký tự và avatar; `profileUsernames/<username>` đặt chỗ tên bằng transaction. Client không được ghi trực tiếp các collection này; vai trò lấy từ hệ thống lớp học và không sửa qua hồ sơ. Ngày tham gia lấy từ Firebase Auth. Tài khoản mới không có lịch học, lớp hay bộ từ mẫu.
+
+Ảnh JPEG/PNG/WebP tối đa 5 MB được cắt vuông, thu nhỏ 256 px và chuyển sang JPEG trước khi lưu cùng hồ sơ trong Firestore (tối đa 100 KB); máy chủ kiểm tra định dạng và kích thước ảnh. Không cần dịch vụ lưu trữ mới. Có xem trước, hủy thay đổi và khôi phục ong mặc định.
+
+Thống kê dùng lượt ôn, kết quả từ và bài tập thực tế, đếm từ và bài hoàn thành không trùng. Lớp học tái sử dụng quyền và dữ liệu lớp hiện có. Chuỗi học tính theo ngày lịch `Asia/Ho_Chi_Minh`: đánh giá flashcard hoặc hoàn tất trò chơi mới ghi ngày học; đăng nhập, xem thẻ hay bắn trúng một từ trong trò chơi chưa hoàn tất không tăng chuỗi. Giữ nguyên lịch sử đã lưu trước bản cập nhật.
+
+Sau khi khởi động Auth/Firestore emulator với project `demo-beelearn`, chạy `npm run test:profile` để kiểm tra lưu hồ sơ, tên trùng, quyền sở hữu, vai trò, ảnh, ngày học và số liệu lớp. Các kiểm tra chỉ chạy trên emulator; không tạo tài khoản thử hay xóa dữ liệu production.
