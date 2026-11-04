@@ -8,3 +8,8 @@ dist/
 *.log
 .DS_Store
 Thumbs.db
+
+# Private Firebase administrator credentials must never enter Git.
+*service-account*.json
+*serviceAccount*.json
+*firebase-adminsdk*.json

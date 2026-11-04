@@ -8,6 +8,9 @@ const env=await initializeTestEnvironment({projectId:'demo-beelearn',firestore:{
 try{
  await env.clearFirestore();
  const db=env.authenticatedContext('alice').firestore(),other=env.authenticatedContext('bob').firestore(),guest=env.unauthenticatedContext().firestore();
+ await assertFails(setDoc(doc(db,'classroomProfiles','alice'),{role:'teacher'}));
+ await assertFails(setDoc(doc(db,'classrooms','forged'),{ownerId:'alice'}));
+ await assertFails(setDoc(doc(db,'classAttempts','forged'),{uid:'alice',completed:true}));
  const base=emptyState();base.decks=[{id:'deck1',name:'Day 1',description:'',cards:[{id:'c1',word:'hello',meaning:'xin chào',pos:'',ipa:'',example:'',translation:'',topic:'',related:'',language:'en-US'}]}];
  await writePatch(db,'alice',createPatch(emptyState(),base,'initial'),'device1');
  await assertSucceeds(getDoc(doc(db,'users','alice','decks','deck1')));

@@ -82,3 +82,9 @@ firebase emulators:exec --only firestore,auth --project demo-beelearn "npm run t
 ```
 
 Kiểm tra quyền chủ sở hữu, chặn truy cập chéo, dữ liệu sai định dạng, hai thiết bị sửa thẻ và gửi lại thao tác. Để chạy giao diện với emulator, khởi động `firebase emulators:start --only firestore,auth --project demo-beelearn`, phục vụ `dist` rồi mở localhost kèm `?emulator=1`. Chế độ này chỉ được bật trên localhost/127.0.0.1; không chạm dữ liệu thật.
+
+## Lớp học
+
+Thêm mục **Lớp học**: vai trò giáo viên/học sinh, tạo/tham gia/duyệt lớp, mã và link mời, giao bộ từ có thời hạn, bài riêng cho học sinh, dùng flashcard và hai game hiện có, thống kê/lịch sử kết quả, ôn từ khó và lưu trữ lớp. Học cá nhân vẫn độc lập.
+
+API máy chủ cần hai biến Firebase Admin trong Vercel; xem [CLASSROOM_SETUP.md](CLASSROOM_SETUP.md). Nếu chưa cấu hình, trang lớp học báo chưa kích hoạt; các chức năng học cá nhân vẫn hoạt động. Không mở quyền Firestore để thay thế API.
