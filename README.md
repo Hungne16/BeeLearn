@@ -40,14 +40,20 @@ Mở `http://localhost:8080`. Không mở `index.html` bằng đường dẫn `f
    - Output Directory: `dist`.
 4. Chọn Node.js 22.x hoặc mới hơn rồi Deploy.
 
-Phiên bản hiện tại không cần biến môi trường và chưa kết nối Firebase.
+Đã cấu hình Firebase project `beelearn-1079b`; không cần biến môi trường để build. Sau khi deploy, thêm **đúng hostname Vercel** vào Firebase Console → Authentication → Settings → Authorized domains. Ví dụ hostname không chứa `https://` hoặc đường dẫn. Chưa thêm tên miền thì Google đăng nhập sẽ báo `unauthorized-domain`.
 
 ## Dữ liệu và Firebase
 
 - Bộ từ mẫu: `public/seed.json` (30 từ IT trong Day 1).
-- Bộ từ và tiến độ được lưu bằng `localStorage`, khóa `nho-tu-v1`.
+- Chưa đăng nhập: bộ từ và tiến độ lưu trên máy bằng `localStorage`, khóa `nho-tu-v1`.
+- Đăng nhập Google: đồng bộ bộ từ, lịch ôn, lượt học và kết quả trò chơi vào Firestore theo UID riêng. Header hiển thị tình trạng đồng bộ.
+- Mỗi tài khoản có bản lưu và hàng đợi riêng trong trình duyệt (`beelearn-cloud:<uid>`). Mất mạng vẫn lưu trên máy và thử gửi lại khi có mạng. Đăng xuất trở về dữ liệu khách, giữ nguyên bản lưu của tài khoản.
+- Tài khoản cloud trống sẽ nhận dữ liệu máy ở lần đăng nhập đầu. Nếu cloud đã có dữ liệu, dùng nút **Gộp dữ liệu máy này** trong tài khoản để thêm dữ liệu khách; không tự ghi đè cloud.
+- Đồng bộ dùng transaction và mã thao tác để thử lại không cộng trùng; thay đổi các trường khác nhau của thẻ được gộp, thẻ đã xóa không bị thay đổi cũ tạo lại. Khi sửa cùng một trường, thao tác được ghi sau cùng thắng.
+- Firestore lưu từng bộ từ trong một document (giới hạn Firebase 1 MiB/document); chia bộ từ lớn thành nhiều bộ nhỏ. Định kỳ xuất JSON làm bản sao lưu độc lập.
 - Dữ liệu trên tên miền `chatgpt.site` không tự chuyển sang tên miền Vercel. Trước khi đổi trang, bấm **Sao lưu** ở trang cũ. Trên trang mới, vào **Quản lý → Nhập CSV / JSON** và nhập bản sao lưu để khôi phục.
-- Firebase Authentication / Firestore chưa được tích hợp. Có thể thêm khi có project Firebase và quy tắc truy cập phù hợp.
+- Firebase Authentication (Google) và Firestore đã được cấu hình. `src/firebase-config.ts` chứa cấu hình Web công khai, không phải khóa quản trị. `firestore.rules` chỉ cho UID sở hữu truy cập nhánh `users/<uid>`. Quy tắc đã được xuất bản trên project.
+- Muốn cập nhật rules bằng CLI sau này: đăng nhập đúng tài khoản có quyền project, rồi `firebase deploy --only firestore:rules --project beelearn-1079b`. Không cần Firebase Admin SDK hoặc service account trong frontend.
 - Không commit service-account key, private key hoặc file `.env` vào repo.
 
 ## Cấu trúc
@@ -55,7 +61,7 @@ Phiên bản hiện tại không cần biến môi trường và chưa kết n�
 ```text
 src/                 TypeScript: flashcard, tiến độ, dashboard, điều hướng, games
 public/              HTML, CSS, hình minh họa và bộ từ mẫu
-scripts/build.mjs    Sao chép public và biên dịch TypeScript
+scripts/build.mjs    Sao chép public, kiểm tra TypeScript và bundle Firebase bằng esbuild
 dist/                Kết quả build, không đưa lên Git
 vercel.json          Cấu hình deploy
 test.mjs             Kiểm tra lịch ôn và CSV
@@ -63,3 +69,13 @@ game-test.mjs        Kiểm tra đáp án, va chạm và bố cục mục tiêu
 ```
 
 Sửa file trong `src/` hoặc `public/`, sau đó chạy lại `npm run build`. Không sửa trực tiếp các file trong `dist/`.
+
+## Kiểm tra Firebase cục bộ
+
+Cài Firebase CLI và Java hỗ trợ emulator. Chạy sau build:
+
+```sh
+firebase emulators:exec --only firestore,auth --project demo-beelearn "npm run test:firebase"
+```
+
+Kiểm tra quyền chủ sở hữu, chặn truy cập chéo, dữ liệu sai định dạng, hai thiết bị sửa thẻ và gửi lại thao tác. Để chạy giao diện với emulator, khởi động `firebase emulators:start --only firestore,auth --project demo-beelearn`, phục vụ `dist` rồi mở localhost kèm `?emulator=1`. Chế độ này chỉ được bật trên localhost/127.0.0.1; không chạm dữ liệu thật.

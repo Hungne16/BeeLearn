@@ -1,3 +1,4 @@
+import {createCloud,type CloudStatus} from './cloud.js';
 import {navigationHTML,Screen} from './navigation.js';
 import {mountDashboard} from './dashboard.js';
 import {mountGames} from './games.js';
@@ -6,13 +7,15 @@ const root=document.querySelector<HTMLDivElement>('#app')!;
 const uid=()=>crypto.randomUUID();
 const esc=(v:unknown)=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]!));
 const $=<T extends HTMLElement=HTMLElement>(id:string)=>document.getElementById(id) as T;
+let cloud:ReturnType<typeof createCloud>|undefined;
+let cloudStatus:CloudStatus={user:null,label:'Lưu trên máy',ready:true};
 let loaded=false;
 let state:State={version:1,decks:[],records:{},activity:{}};
 let stopGames=()=>{};
 let page:'library'|'study'|'editor'|'games'='library',deckId='',mode='study',queue:string[]=[],index=0,flipped=false,locked=false,completed=false,hardOnly=false,search='',topic='',round=1;
 let retry=new Set<string>(),rated=new Set<string>(),switchTimer=0,noticeTimer=0;
 function toast(s:string){$('notice').textContent=s;$('notice').style.display='block';clearTimeout(noticeTimer);noticeTimer=window.setTimeout(()=>$('notice').style.display='none',4000)}
-function save(){try{localStorage.setItem('nho-tu-v1',JSON.stringify(state))}catch{toast('Trình duyệt không cho lưu tiến độ. Hãy xuất JSON để giữ dữ liệu.')}}
+function save(){try{if(cloud)cloud.save(state);else localStorage.setItem('nho-tu-v1',JSON.stringify(state))}catch{toast('Trình duyệt không cho lưu tiến độ. Hãy xuất JSON để giữ dữ liệu.')}}
 function deck(){return state.decks.find(d=>d.id===deckId)!}
 function rec(c:Vocabulary){return state.records[c.id]}
 function due(c:Vocabulary){return !rec(c)||rec(c).due<=Date.now()}
@@ -24,14 +27,25 @@ function refreshNavigation(){
  const target=$('navigationRoot');if(!target)return;
  navigationResize.disconnect();
  target.innerHTML=navigationHTML(state,deckId,page==='study'?mode as Screen:page);
+ const actions=target.querySelector('.dash-header-actions')!;
+ actions.insertAdjacentHTML('beforeend',`<button id="accountButton" class="cloud-account" title="${esc(cloudStatus.label)}"><span class="cloud-dot ${cloudStatus.user?'connected':''}"></span>${esc(cloudStatus.user?.displayName?.split(' ').slice(-1)[0]||'Đăng nhập')}<span class="cloud-label">${esc(cloudStatus.label)}</span></button>`);
+ $('accountButton').onclick=accountDialog;
+ $('appSurface').inert=!!cloudStatus.user&&!cloudStatus.ready;
  navigationResize.observe($('sharedHeader'));
  target.querySelectorAll<HTMLElement>('[data-nav]').forEach(b=>b.onclick=()=>{
   const screen=b.dataset.nav as Screen;
   if(screen==='study'||screen==='recall'||screen==='review'){page='study';mode=screen;hardOnly=false;start()}
   else{page=screen;if(page==='editor'){search='';topic=''}}render();window.scrollTo({top:0,behavior:'instant'});
  });
- $('globalCreate').onclick=()=>deckForm();$('globalBackup').onclick=()=>download('nho-tu-backup.json',JSON.stringify(state,null,2));
+ $('globalCreate').onclick=()=>{if(cloudStatus.user&&!cloudStatus.ready){toast('Đợi kết nối tài khoản xong nhé.');return}deckForm()};$('globalBackup').onclick=()=>download('nho-tu-backup.json',JSON.stringify(state,null,2));
  $('globalDeck').onchange=e=>{deckId=(e.target as HTMLSelectElement).value;search='';topic='';if(page==='study')start();render()};
+}
+function accountDialog(){
+ document.querySelector('dialog')?.remove();const dialog=document.createElement('dialog');
+ dialog.innerHTML=`<div class="row between"><h2>${cloudStatus.user?'Tài khoản':'Lưu tiến độ lên cloud'}</h2><button id="accountClose" aria-label="Đóng">✕</button></div><p>${esc(cloudStatus.user?.email||'Đăng nhập để học tiếp trên thiết bị khác.')}</p><p id="accountStatus">${esc(cloudStatus.label)}</p><div class="row">${cloudStatus.user?'<button id="syncRetry">↻ Đồng bộ</button><button id="importGuest">Gộp dữ liệu máy này</button><button id="signOut">Đăng xuất</button>':'<button class="primary" id="googleLogin">Đăng nhập Google</button>'}</div>`;
+ document.body.append(dialog);dialog.showModal();$('accountClose').onclick=()=>dialog.close();
+ if(cloudStatus.user){$('syncRetry').onclick=()=>cloud?.retry();$('importGuest').onclick=()=>cloud?.importGuest();$('signOut').onclick=()=>{dialog.close();void cloud?.logout()}}
+ else $('googleLogin').onclick=()=>{dialog.close();void cloud?.login()};
 }
 function render(){stopGames();stopGames=()=>{};if(!$('navigationRoot'))root.innerHTML='<div id="navigationRoot"></div><main id="appSurface" class="shell universal-shell"><div id="view"></div></main>';
  $('appSurface').className=`shell universal-shell ${page==='library'?'is-dashboard':''} screen-${page}`;
@@ -86,6 +100,6 @@ function editor(){refreshNavigation();const d=deck();const topics=[...new Set(d.
 function download(name:string,content:string){const url=URL.createObjectURL(new Blob([content],{type:'application/json;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
 function importForm(){modal('Nhập từ vựng',`<p class="muted">CSV cần tiêu đề <b>word,meaning,pos,ipa,example,translation,topic,language,related</b>. Hai cột word và meaning bắt buộc; các cột khác tùy chọn. JSON nhận mảng từ hoặc bộ từ đã xuất. Dữ liệu được thêm vào bộ hiện tại; từ trùng được bỏ qua.</p><label>Chọn file <input type="file" name="file" accept=".csv,.json" required></label><p class="muted">Nhập file sao lưu toàn bộ sẽ khôi phục các bộ từ và tiến độ sau khi bạn xác nhận.</p>`,f=>{const file=f.get('file') as File;file.text().then(text=>{try{let raw:unknown;if(file.name.toLowerCase().endsWith('.json'))raw=JSON.parse(text);else{const rows=parseCSV(text.replace(/^\uFEFF/,''));const heads=rows.shift()?.map(s=>s.trim().toLowerCase())??[];if(!heads.includes('word')||!heads.includes('meaning'))throw Error('CSV cần hai cột word và meaning.');raw=rows.map(r=>Object.fromEntries(heads.map((k,i)=>[k,r[i]??''])))}if(isBackup(raw)){if(confirm('Khôi phục bản sao lưu? Các bộ từ và tiến độ hiện tại sẽ được thay thế.')){state=raw;save();page='library';render();toast('Đã khôi phục dữ liệu.')}return}const list=Array.isArray(raw)?raw:(raw as {cards?:unknown[]})?.cards;if(!Array.isArray(list))throw Error('JSON cần là mảng từ hoặc một bộ từ có cards.');const values:Vocabulary[]=list.map((item:unknown)=>{if(!item||typeof item!=='object')throw Error('Thẻ không hợp lệ.');const v=item as Record<string,unknown>;if(typeof v.word!=='string'||!v.word.trim()||typeof v.meaning!=='string'||!v.meaning.trim())throw Error('Mỗi thẻ cần word và meaning không rỗng.');const card={id:uid()} as Vocabulary;for(const [key] of fields)card[key]=typeof v[key]==='string'?String(v[key]).trim():'';for(const key of ['acceptedMeanings','synonyms'] as const){const values=v[key];if(Array.isArray(values))card[key]=values.filter((x):x is string=>typeof x==='string').map(x=>x.trim()).filter(Boolean);else if(typeof values==='string')card[key]=values.split('|').map(x=>x.trim()).filter(Boolean)}card.language||='en-US';return card});const seen=new Set(deck().cards.map(c=>c.word.toLowerCase()));let added=0;for(const c of values){if(!seen.has(c.word.toLowerCase())){seen.add(c.word.toLowerCase());deck().cards.push(c);added++}}save();editor();toast(`Đã thêm ${added} từ; bỏ qua ${values.length-added} từ trùng.`)}catch(e){toast(e instanceof Error?e.message:'Không đọc được file.')}}).catch(()=>toast('Không đọc được file đã chọn.'))})}
 function isBackup(v:unknown):v is State{if(!v||typeof v!=='object')return false;const s=v as State;if(s.version!==1||!Array.isArray(s.decks)||!s.records||typeof s.records!=='object'||!s.activity||typeof s.activity!=='object')return false;const ids=new Set<string>();for(const d of s.decks){if(typeof d.id!=='string'||!/^[-a-zA-Z0-9_]+$/.test(d.id)||typeof d.name!=='string'||typeof d.description!=='string'||!Array.isArray(d.cards))return false;for(const c of d.cards){if(!c||typeof c.id!=='string'||!/^[-a-zA-Z0-9_]+$/.test(c.id)||ids.has(c.id)||fields.some(([k])=>typeof c[k]!=='string')||!c.word.trim()||!c.meaning.trim()||['acceptedMeanings','synonyms'].some(k=>{const v=c[k as 'acceptedMeanings'|'synonyms'];return v!==undefined&&(!Array.isArray(v)||v.some(x=>typeof x!=='string'))}))return false;ids.add(c.id)}}for(const r of Object.values(s.records)){if(!r||['streak','failures','reviews','interval','due','last'].some(k=>!Number.isFinite(r[k as keyof LearningRecord]))||typeof r.remembered!=='boolean')return false}return Object.values(s.activity).every(n=>Number.isFinite(n)&&n>=0)}
-document.addEventListener('keydown',e=>{if(page!=='study'||document.querySelector('dialog[open]')||['INPUT','SELECT','TEXTAREA','BUTTON'].includes((e.target as HTMLElement).tagName)||e.repeat)return;if(e.code==='Space'){e.preventDefault();flip()}if(e.key==='ArrowLeft'){e.preventDefault();navigate(-1)}if(e.key==='ArrowRight'){e.preventDefault();navigate(1)}if(e.key==='1')rate(false);if(e.key==='2')rate(true)});
-async function init(){try{const saved=localStorage.getItem('nho-tu-v1');if(saved){const parsed=JSON.parse(saved);if(!isBackup(parsed))throw Error('invalid');state=parsed;loaded=true}}catch{toast('Không đọc được dữ liệu đã lưu. Bạn có thể nhập lại bản sao lưu.')}if(!loaded){const data=await fetch('seed.json').then(r=>r.json()) as Vocabulary[];state.decks=[{id:uid(),name:'Day 1 · Tiếng Anh IT',description:'30 từ nền tảng về hệ thống, lập trình, dữ liệu và bảo mật.',cards:data}];save()}render()}
+document.addEventListener('keydown',e=>{if((cloudStatus.user&&!cloudStatus.ready)||page!=='study'||document.querySelector('dialog[open]')||['INPUT','SELECT','TEXTAREA','BUTTON'].includes((e.target as HTMLElement).tagName)||e.repeat)return;if(e.code==='Space'){e.preventDefault();flip()}if(e.key==='ArrowLeft'){e.preventDefault();navigate(-1)}if(e.key==='ArrowRight'){e.preventDefault();navigate(1)}if(e.key==='1')rate(false);if(e.key==='2')rate(true)});
+async function init(){try{const saved=localStorage.getItem('nho-tu-v1');if(saved){const parsed=JSON.parse(saved);if(!isBackup(parsed))throw Error('invalid');state=parsed;loaded=true}}catch{toast('Không đọc được dữ liệu đã lưu. Bạn có thể nhập lại bản sao lưu.')}if(!loaded){const data=await fetch('seed.json').then(r=>r.json()) as Vocabulary[];state.decks=[{id:uid(),name:'Day 1 · Tiếng Anh IT',description:'30 từ nền tảng về hệ thống, lập trình, dữ liệu và bảo mật.',cards:data}];save()}render();cloud=createCloud(()=>state,s=>{state=s;if(!deck()){deckId=state.decks[0]?.id??'';page='library'}if(page==='games')refreshNavigation();else{if(page==='study')start();render()}},s=>{cloudStatus=s;refreshNavigation();if($('accountStatus'))$('accountStatus').textContent=s.label},toast,isBackup)}
 init().catch(()=>{root.innerHTML='<main class="shell"><h1>Chưa tải được bộ từ.</h1><p>Hãy tải lại trang khi có kết nối mạng.</p><button onclick="location.reload()">Thử lại</button></main>'});

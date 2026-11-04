@@ -6,8 +6,18 @@
   "scripts": {
     "build": "node scripts/build.mjs",
     "typecheck": "tsc --noEmit",
-    "test": "node test.mjs && node game-test.mjs"
+    "test": "node test.mjs && node game-test.mjs",
+    "test:firebase": "node firebase-test.mjs"
   },
-  "engines": { "node": ">=22" },
-  "devDependencies": { "typescript": "5.9.3" }
+  "engines": {
+    "node": ">=22"
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^5.0.2",
+    "esbuild": "^0.28.2",
+    "typescript": "5.9.3"
+  },
+  "dependencies": {
+    "firebase": "12.8.0"
+  }
 }

@@ -4,3 +4,5 @@
 
 @media(max-width:700px){.space-stage{min-height:330px}.space-stage canvas{height:330px}}
 .game-pick .pick-art{transform:scale(.65)!important;transform-origin:bottom right;right:18px;bottom:75px}.game-pick .pick-copy p{max-width:50%;line-height:1.7}
+
+.cloud-account{display:flex;align-items:center;gap:7px;flex-wrap:wrap}.cloud-dot{width:9px;height:9px;border-radius:50%;background:#aaa}.cloud-dot.connected{background:#58cc02}.cloud-label{font-size:11px;color:#777}.cloud-account:focus-visible{outline:3px solid #1cb0f6}@media(max-width:700px){.cloud-label{display:none}}

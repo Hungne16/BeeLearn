@@ -1,0 +1,18 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function owner(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+    match /users/{uid}/{group}/{item} {
+      allow read: if owner(uid) && group in ['decks', 'records', 'activity', 'performance', 'history', 'metadata', 'operations'];
+      allow create, update: if owner(uid) && (
+        (group in ['decks', 'records', 'performance', 'history'] && request.resource.data.keys().hasOnly(['value', 'updatedAt']) && request.resource.data.value is map) ||
+        (group == 'activity' && request.resource.data.keys().hasOnly(['count', 'updatedAt']) && request.resource.data.count is int && request.resource.data.count >= 0) ||
+        (group == 'metadata' && item == 'sync' && request.resource.data.keys().hasOnly(['version', 'clientId', 'updatedAt']) && request.resource.data.version == 1 && request.resource.data.clientId is string) ||
+        (group == 'operations' && request.resource.data.keys().hasOnly(['createdAt']))
+      );
+      allow delete: if owner(uid) && group in ['decks', 'records', 'activity', 'performance', 'history'];
+    }
+  }
+}
