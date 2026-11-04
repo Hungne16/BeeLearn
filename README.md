@@ -98,3 +98,11 @@ Tài khoản mới luôn bắt đầu rỗng, không đọc `seed.json` và khô
 App hỗ trợ đường dẫn `/dashboard`, `/decks`, `/games`, `/classrooms`, `/assignments`, `/profile`, `/demo`, `/login`, `/register` và điều hướng hash tương ứng. Khách vào đường dẫn riêng được đưa đến đăng nhập; có trạng thái kiểm tra phiên và tải tài khoản. Onboarding rút gọn nằm ở dashboard trống và có thể mở lại bằng Tổng quan; nút lớp học theo vai trò đã lưu.
 
 Kiểm tra UI bằng Firebase Emulator: khách không thấy Day 1; cả hai demo game chạy; tạo A sau demo vẫn rỗng; A tạo bộ và học thẻ; đăng xuất về landing; B bắt đầu rỗng không thấy A; đăng nhập lại A khôi phục bộ và tiến độ; vai trò giáo viên vẫn có nút tạo lớp. Không tạo tài khoản thử trên project thật.
+
+## Form đăng nhập và đăng ký
+
+Hai form nằm trong cùng một scene SVG và cùng tồn tại trong DOM. Khung ong và khung form đổi chỗ bằng transform trong 760ms; nút chuyển bị khóa khi đang trượt, form ẩn dùng inert để không nhận focus. Bản điện thoại thu gọn minh họa; reduced-motion tắt chuyển động.
+
+Email/password dùng Firebase Auth có thật: remember-me chọn local/session persistence; quên mật khẩu gọi email reset; đăng ký cập nhật tên và gọi API máy chủ để lưu vai trò. Không tự tạo bộ mẫu. Google vẫn có sẵn. Vai trò chưa gửi thành công được giữ riêng theo UID để thử lại khi đăng nhập; quyền lớp vẫn do máy chủ kiểm tra.
+
+Đã thử trên emulator: sai xác nhận mật khẩu, sai mật khẩu đăng nhập, đăng ký giáo viên, thư viện mới trống, vai trò đúng và đăng nhập lại với phiên tạm.
