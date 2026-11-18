@@ -1,12 +1,15 @@
+import {publishedLesson} from './grammar-curriculum.js';
+import {publicLesson,grammarActivities} from './grammar-domain.js';
 import {randomUUID} from 'node:crypto';
 import {ensure,id,text,hash,inviteCode,snapshotDeck,sampleCards,activities,emptyResult,resultView,applyAnswer,finishAttempt} from './classroom-domain.js';
 export function classroomService(db){
  const profile=uid=>db.doc(`classroomProfiles/${uid}`),cls=cid=>db.doc(`classrooms/${id(cid)}`),member=(cid,uid)=>cls(cid).collection('members').doc(uid),enrollment=(cid,uid)=>db.doc(`classEnrollments/${hash(cid+':'+uid)}`),assignment=(cid,aid)=>cls(cid).collection('assignments').doc(id(aid));
+ const safeAssignment=a=>a.grammar?{...a,grammar:publicLesson(a.grammar)}:a;
  const data=s=>s.exists?{id:s.id,...s.data()}:null;
  async function requireClass(user,cid,teacher=false,tx=null){const ref=cls(cid),c=data(await (tx?tx.get(ref):ref.get()));ensure(c,'Không tìm thấy lớp.',404);if(c.ownerId!==user.uid){ensure(!teacher,'Chỉ giáo viên của lớp được thao tác.');const m=await (tx?tx.get(member(cid,user.uid)):member(cid,user.uid).get());ensure(m.data()?.status==='active','Bạn chưa được duyệt vào lớp.')}return c}
  async function requireAssignment(user,cid,aid,tx=null){const c=await requireClass(user,cid,false,tx),ref=assignment(cid,aid),a=data(await(tx?tx.get(ref):ref.get()));ensure(a,'Không tìm thấy bài tập.',404);ensure(c.ownerId===user.uid||!a.targets||a.targets.includes(user.uid),'Bài tập không giao cho bạn.');return {c,a}}
  const notifyName=user=>text(user.name||'Người học',100);
- return async function execute(user,action,input={}){
+ const execute=async function execute(user,action,input={}){
   const now=Date.now(),uid=user.uid;
   if(action==='home'){
    const p=data(await profile(uid).get());if(!p)return {profile:null,classes:[]};
@@ -27,7 +30,7 @@ export function classroomService(db){
   }
   if(action==='detail'){
    const c=await requireClass(user,input.classId),teacher=c.ownerId===uid,cid=c.id;const [members,assignments]=await Promise.all([cls(cid).collection('members').get(),cls(cid).collection('assignments').get()]);
-   const as=assignments.docs.map(data).filter(a=>teacher||!a.targets||a.targets.includes(uid));const assignmentsWithResults=await Promise.all(as.map(async a=>{const snap=teacher?await assignment(cid,a.id).collection('results').get():null;const own=teacher?null:await assignment(cid,a.id).collection('results').doc(uid).get();return {...a,result:teacher?null:resultView(a,own?.data()),results:teacher?snap.docs.map(d=>resultView(a,d.data())):undefined}}));
+   const as=assignments.docs.map(data).filter(a=>teacher||!a.targets||a.targets.includes(uid));const assignmentsWithResults=await Promise.all(as.map(async a=>{const snap=teacher?await assignment(cid,a.id).collection('results').get():null;const own=teacher?null:await assignment(cid,a.id).collection('results').doc(uid).get();return {...safeAssignment(a),result:teacher?null:resultView(a,own?.data()),results:teacher?snap.docs.map(d=>resultView(a,d.data())):undefined}}));
    return {classroom:{...c,code:teacher?c.code:undefined},members:members.docs.map(data).filter(m=>teacher||m.status==='active').map(m=>({uid:m.uid,name:m.name,status:m.status,joinedAt:m.joinedAt})),assignments:assignmentsWithResults};
   }
   if(action==='settings'){
@@ -40,16 +43,17 @@ export function classroomService(db){
   }
   if(action==='publish'){
    const cid=id(input.classId),aid=id(input.requestId),title=text(input.title,150);ensure(title,'Nhập tiêu đề bài tập.',400);ensure(Array.isArray(input.activities)&&input.activities.length&&new Set(input.activities).size===input.activities.length&&input.activities.every(a=>activities.includes(a)),'Chọn hoạt động học.',400);ensure(Number.isFinite(input.deadline)&&input.deadline>now,'Hạn nộp phải ở tương lai.',400);ensure(Number.isInteger(input.minAccuracy)&&input.minAccuracy>=0&&input.minAccuracy<=100,'Độ chính xác từ 0 đến 100.',400);ensure([8,12,20].includes(input.gameSize),'Số từ mỗi lượt không hợp lệ.',400);
-   return db.runTransaction(async tx=>{const c=await requireClass(user,cid,true,tx);ensure(!c.archived,'Lớp đã lưu trữ.');const existing=await tx.get(assignment(cid,aid));if(existing.exists)return data(existing);let sourceDeck;if(input.reviewSourceAssignmentId){const source=await tx.get(assignment(cid,id(input.reviewSourceAssignmentId)));ensure(source.exists,'Không tìm thấy bài gốc.',404);sourceDeck=source.data().deck}else{const deckDoc=await tx.get(db.doc(`users/${uid}/decks/${id(input.deckId)}`));ensure(deckDoc.exists,'Bộ từ chưa đồng bộ lên Firebase. Hãy đợi đồng bộ xong.',409);sourceDeck=deckDoc.data().value}let deck=snapshotDeck(sourceDeck);
+   const hasVocabulary=input.activities.some(a=>['flashcard','memory','shooter'].includes(a));const grammar=input.activities.some(a=>grammarActivities.includes(a))?await publishedLesson(db,uid,id(input.grammarLessonId)):null;if(grammar){for(const a of input.activities){if(a==='grammarQuiz')ensure(grammar.exercises.some(q=>!['builder','detective'].includes(q.type)),'Bài chưa có câu luyện tập.',400);if(a==='sentenceBuilder'||a==='grammarDetective')ensure(grammar.exercises.some(q=>q.type===(a==='sentenceBuilder'?'builder':'detective')),'Bài chưa có trò chơi được chọn.',400)}}const startAt=Number(input.startAt)||now;ensure(startAt<input.deadline,'Giờ bắt đầu phải trước hạn nộp.',400);const maxAttempts=Number(input.maxAttempts)||0;ensure(Number.isInteger(maxAttempts)&&maxAttempts>=0&&maxAttempts<=100,'Số lượt từ 0 đến 100.',400);
+   return db.runTransaction(async tx=>{const c=await requireClass(user,cid,true,tx);ensure(!c.archived,'Lớp đã lưu trữ.');const existing=await tx.get(assignment(cid,aid));if(existing.exists)return data(existing);let sourceDeck;if(!hasVocabulary)sourceDeck=null;else if(input.reviewSourceAssignmentId){const source=await tx.get(assignment(cid,id(input.reviewSourceAssignmentId)));ensure(source.exists,'Không tìm thấy bài gốc.',404);sourceDeck=source.data().deck}else{const deckDoc=await tx.get(db.doc(`users/${uid}/decks/${id(input.deckId)}`));ensure(deckDoc.exists,'Bộ từ chưa đồng bộ lên Firebase. Hãy đợi đồng bộ xong.',409);sourceDeck=deckDoc.data().value}let deck=sourceDeck?snapshotDeck(sourceDeck):{id:"grammar",name:"Ngữ pháp",cards:[]};
     if(input.reviewWordIds){ensure(Array.isArray(input.reviewWordIds)&&input.reviewWordIds.length,'Chọn từ cần ôn.',400);deck={...deck,cards:deck.cards.filter(c=>input.reviewWordIds.includes(c.id))};ensure(deck.cards.length,'Không có từ cần ôn trong bộ này.',400)}
     let targets=null;if(input.targets){ensure(Array.isArray(input.targets)&&input.targets.length>0&&input.targets.length<=200,'Chọn học sinh nhận bài.',400);targets=[...new Set(input.targets.map(id))];const ms=await Promise.all(targets.map(u=>tx.get(member(cid,u))));ensure(ms.every(m=>m.data()?.status==='active'),'Có học sinh chưa tham gia lớp.',400)}
-    const a={title,deck,activities:input.activities,deadline:input.deadline,minAccuracy:input.minAccuracy,gameSize:input.gameSize,requireRemembered:!!input.requireRemembered,targets,teacherName:c.teacherName,createdAt:now,ownerId:uid,version:1};tx.create(assignment(cid,aid),a);return {id:aid,...a}});
+    const a={title,description:text(input.description??'',2000),startAt,maxAttempts,...(grammar?{grammar}:{}),deck,activities:input.activities,deadline:input.deadline,minAccuracy:input.minAccuracy,gameSize:input.gameSize,requireRemembered:!!input.requireRemembered,targets,teacherName:c.teacherName,createdAt:now,ownerId:uid,version:1};tx.create(assignment(cid,aid),a);return safeAssignment({id:aid,...a})});
   }
   if(action==='start'){
    ensure(p.role==='student','Chỉ học sinh nộp kết quả bài tập.');const cid=id(input.classId),aid=id(input.assignmentId),requestId=id(input.requestId),attemptId=hash(uid+':'+cid+':'+aid+':'+requestId),ref=db.doc(`classAttempts/${attemptId}`);
-   return db.runTransaction(async tx=>{const {c,a}=await requireAssignment(user,cid,aid,tx);ensure(!c.archived,'Lớp đã lưu trữ.');ensure(a.activities.includes(input.activity),'Hoạt động không thuộc bài tập.',400);const old=await tx.get(ref);if(old.exists){ensure(old.data().uid===uid);return {attempt:data(old),assignment:a,classroom:c}}
-    const resultRef=assignment(cid,aid).collection('results').doc(uid),oldResult=await tx.get(resultRef),r=oldResult.data()??emptyResult(uid);const activity=input.activity;const attempt={uid,classId:cid,assignmentId:aid,activity,deck:{...a.deck,cards:sampleCards(a.deck,activity,a.gameSize)},startedAt:now,lastAt:now,finishedAt:null,eventCount:0,correct:0,incorrect:0,score:0,combo:0,words:{}};
-    r.attempts++;r.lastAt=now;r.activities[activity]={...r.activities[activity],attempts:(r.activities[activity]?.attempts??0)+1};tx.create(ref,attempt);tx.set(resultRef,r);return {attempt:{id:attemptId,...attempt},assignment:a,classroom:c}});
+   return db.runTransaction(async tx=>{const {c,a}=await requireAssignment(user,cid,aid,tx);ensure(!c.archived,'Lớp đã lưu trữ.');ensure((a.startAt??0)<=now,'Chưa đến giờ bắt đầu.',409);ensure(['flashcard','memory','shooter'].includes(input.activity)&&a.activities.includes(input.activity),'Hoạt động không thuộc bài tập từ vựng.',400);const old=await tx.get(ref);if(old.exists){ensure(old.data().uid===uid);return {attempt:data(old),assignment:safeAssignment(a),classroom:c}}
+    const resultRef=assignment(cid,aid).collection('results').doc(uid),oldResult=await tx.get(resultRef),r=oldResult.data()??emptyResult(uid);const activity=input.activity;ensure(!a.maxAttempts||(r.activities[activity]?.attempts??0)<a.maxAttempts,'Đã hết số lượt làm bài.',409);const attempt={uid,classId:cid,assignmentId:aid,activity,deck:{...a.deck,cards:sampleCards(a.deck,activity,a.gameSize)},startedAt:now,lastAt:now,finishedAt:null,eventCount:0,correct:0,incorrect:0,score:0,combo:0,words:{}};
+    r.attempts++;r.lastAt=now;r.activities[activity]={...r.activities[activity],attempts:(r.activities[activity]?.attempts??0)+1};tx.create(ref,attempt);tx.set(resultRef,r);return {attempt:{id:attemptId,...attempt},assignment:safeAssignment(a),classroom:c}});
   }
   if(action==='answer'||action==='finish'){
    const attemptId=id(input.attemptId),ref=db.doc(`classAttempts/${attemptId}`);return db.runTransaction(async tx=>{
@@ -61,8 +65,9 @@ export function classroomService(db){
    });
   }
   if(action==='history'){
-   const {c,a}=await requireAssignment(user,input.classId,input.assignmentId),studentId=input.studentId? id(input.studentId):uid;ensure(c.ownerId===uid||studentId===uid,'Bạn chỉ được xem kết quả của mình.');const snap=await db.collection('classAttempts').where('uid','==',studentId).get();return snap.docs.map(data).filter(t=>t.classId===c.id&&t.assignmentId===a.id).sort((a,b)=>b.startedAt-a.startedAt).map(({deck,...rest})=>({...rest,wordCount:deck.cards.length})).slice(0,50);
+   const {c,a}=await requireAssignment(user,input.classId,input.assignmentId),studentId=input.studentId? id(input.studentId):uid;ensure(c.ownerId===uid||studentId===uid,'Bạn chỉ được xem kết quả của mình.');const [snap,grammar]=await Promise.all([db.collection('classAttempts').where('uid','==',studentId).get(),db.collection('grammarAttempts').where('uid','==',studentId).get()]);return [...snap.docs.map(data),...grammar.docs.map(d=>{const {lesson,answers,...v}=data(d);return {...v,accuracy:v.index?Math.round(v.correct/v.index*100):0,wordCount:0}})].filter(t=>t.classId===c.id&&t.assignmentId===a.id).sort((a,b)=>b.startedAt-a.startedAt).map(({deck,...rest})=>({...rest,wordCount:deck?.cards.length??0})).slice(0,50);
   }
   ensure(false,'Không tìm thấy thao tác.',400);
  };
+ return Object.assign(execute,{requireAssignment});
 }

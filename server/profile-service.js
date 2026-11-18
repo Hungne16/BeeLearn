@@ -1,3 +1,4 @@
+import {grammarSummary} from './grammar-service.js';
 import {randomUUID} from 'node:crypto';
 import {ensure,id,text} from './classroom-domain.js';
 import {classroomService} from './classroom-service.js';
@@ -24,8 +25,8 @@ export function profileService(db,auth){
    const [home,records,performance,activity,attempts]=await Promise.all([classroomService(db)(user,'home'),db.collection(`users/${uid}/records`).get(),db.collection(`users/${uid}/performance`).get(),db.collection(`users/${uid}/activity`).get(),db.collection('classAttempts').where('uid','==',uid).get()]);
    const words=new Set(),days={};records.forEach(d=>{if(d.data().value?.reviews>0)words.add(d.id)});performance.forEach(d=>{const r=d.data().value;if(r?.correct+r?.incorrect>0)words.add(d.id)});activity.forEach(d=>{if(d.data().count>0)days[d.id]=1});const assignments=new Map();
    attempts.forEach(d=>{const a=d.data();for(const [key,w]of Object.entries(a.words??{}))if(w.correct+w.incorrect>0)words.add(key);if(a.finishedAt&&a.passed)days[vietnamDay(new Date(a.finishedAt))]=1;assignments.set(a.classId+'/'+a.assignmentId,{classId:a.classId,assignmentId:a.assignmentId})});
-   let completed=0;await Promise.all([...assignments.values()].map(async a=>{const r=await db.doc(`classrooms/${a.classId}/assignments/${a.assignmentId}/results/${uid}`).get();if(r.data()?.completedAt)completed++}));
-   return {...p,role:home.profile?.role??null,classes:home.classes.filter(c=>!c.membership||c.membership==='active'),stats:{streak:profileStreak(days),practiced:words.size,completed},timezone:'Asia/Ho_Chi_Minh'};
+   await Promise.all(home.classes.filter(c=>!c.membership||c.membership==='active').map(async c=>{const rows=await db.collection(`classrooms/${c.id}/assignments`).get();rows.forEach(d=>{if(!d.data().targets||d.data().targets.includes(uid))assignments.set(c.id+'/'+d.id,{classId:c.id,assignmentId:d.id})})}));const grammarAttempts=await db.collection('grammarAttempts').where('uid','==',uid).get();grammarAttempts.forEach(d=>{const a=d.data();if(a.classId)assignments.set(a.classId+'/'+a.assignmentId,{classId:a.classId,assignmentId:a.assignmentId})});let completed=0;await Promise.all([...assignments.values()].map(async a=>{const r=await db.doc(`classrooms/${a.classId}/assignments/${a.assignmentId}/results/${uid}`).get();if(r.data()?.completedAt)completed++}));
+   return {...p,role:home.profile?.role??null,classes:home.classes.filter(c=>!c.membership||c.membership==='active'),stats:{streak:profileStreak(days),practiced:words.size,completed},grammar:await grammarSummary(db,uid),timezone:'Asia/Ho_Chi_Minh'};
   }
   ensure(false,'Không tìm thấy thao tác hồ sơ.',400);
  };

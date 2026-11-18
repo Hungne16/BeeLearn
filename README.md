@@ -107,6 +107,10 @@ Email/password dùng Firebase Auth có thật: remember-me chọn local/session 
 
 Đã thử trên emulator: sai xác nhận mật khẩu, sai mật khẩu đăng nhập, đăng ký giáo viên, thư viện mới trống, vai trò đúng và đăng nhập lại với phiên tạm.
 
+## Học ngữ pháp
+
+Mục **Ngữ pháp** bổ sung thư viện A1–C1, bài học tương tác, luyện tập, Xếp câu và Thám tử ngữ pháp. Tiến độ lưu riêng theo tài khoản và xuất hiện trong Hồ sơ. Giáo viên soạn/xuất bản bài và giao bài ngữ pháp hoặc kết hợp từ vựng qua lớp hiện có. Xem [GRAMMAR.md](GRAMMAR.md) để biết cách dùng, mô hình dữ liệu, phiên bản và kiểm tra.
+
 ## Hồ sơ cá nhân và điều hướng
 
 Thanh đầu trang giữ bốn mục Tổng quan, Học tập, Thư viện và Lớp học. Học tập chứa học thẻ, kiểm tra, ôn tập và trò chơi; menu ⋯ chứa nhập từ/sao lưu. Bấm avatar → **Hồ sơ cá nhân** để mở `/profile`. Menu tài khoản vẫn có đồng bộ và đăng xuất.
@@ -118,3 +122,7 @@ Hồ sơ dùng API Firebase Admin hiện có, xác định chủ hồ sơ bằng
 Thống kê dùng lượt ôn, kết quả từ và bài tập thực tế, đếm từ và bài hoàn thành không trùng. Lớp học tái sử dụng quyền và dữ liệu lớp hiện có. Chuỗi học tính theo ngày lịch `Asia/Ho_Chi_Minh`: đánh giá flashcard hoặc hoàn tất trò chơi mới ghi ngày học; đăng nhập, xem thẻ hay bắn trúng một từ trong trò chơi chưa hoàn tất không tăng chuỗi. Giữ nguyên lịch sử đã lưu trước bản cập nhật.
 
 Sau khi khởi động Auth/Firestore emulator với project `demo-beelearn`, chạy `npm run test:profile` để kiểm tra lưu hồ sơ, tên trùng, quyền sở hữu, vai trò, ảnh, ngày học và số liệu lớp. Các kiểm tra chỉ chạy trên emulator; không tạo tài khoản thử hay xóa dữ liệu production.
+
+## Giao bài nhanh
+
+Giáo viên bấm **Giao bài** ngay trên thẻ lớp, chọn nội dung và hạn nộp rồi giao trực tiếp. Form tự điền tên, chọn hoạt động phù hợp và mặc định giao cả lớp; lịch, điểm tối thiểu, số lượt, người nhận riêng và các trò chơi nằm trong **Tùy chọn thêm**. Dữ liệu vẫn dùng API bài tập hiện có. `npm run test:assignment` kiểm tra mặc định, bài kết hợp, người nhận, hạn nộp và giữ snapshot bài ôn từ khó.

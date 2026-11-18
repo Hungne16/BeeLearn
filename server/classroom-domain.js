@@ -4,7 +4,7 @@ export function ensure(ok,message='Thao tác không được phép.',status=403)
 export const id=value=>{ensure(typeof value==='string'&&/^[-a-zA-Z0-9_]{1,128}$/.test(value)&&!['__proto__','prototype','constructor'].includes(value),'Mã không hợp lệ.',400);return value};
 export const text=(value,max=200)=>{ensure(typeof value==='string'&&value.trim().length<=max,'Nội dung không hợp lệ.',400);return value.trim()};
 export const hash=value=>createHash('sha256').update(value).digest('hex');
-export const activities=['flashcard','memory','shooter'];
+export const activities=['flashcard','memory','shooter','grammarLesson','grammarQuiz','sentenceBuilder','grammarDetective'];
 export function inviteCode(){return Array.from({length:10},()=> 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[randomInt(32)]).join('')}
 const normalize=s=>s.normalize('NFC').trim().toLocaleLowerCase().replace(/\s+/g,' ');
 const aliases=c=>[c.meaning,...c.meaning.split(/[,;]+/),...(c.acceptedMeanings??[])].map(normalize);
@@ -18,9 +18,9 @@ export function snapshotDeck(raw){
 export function sampleCards(deck,activity,size){if(activity==='flashcard')return deck.cards;const seen=new Set();const cards=deck.cards.filter(c=>{const k=normalize(c.word);if(seen.has(k))return false;seen.add(k);return true});for(let i=cards.length-1;i>0;i--){const j=randomInt(i+1);[cards[i],cards[j]]=[cards[j],cards[i]]}return cards.slice(0,size)}
 export const emptyResult=uid=>({uid,attempts:0,correct:0,incorrect:0,lastAt:0,completedAt:null,words:{},activities:{}});
 export function resultView(assignment,result,now=Date.now()){
- const r=result??emptyResult('');const cardCount=assignment.deck.cards.length;
+ const r=result??emptyResult('');const cardCount=(assignment.deck?.cards.length??0);
  const flash=Object.values(r.words??{}).filter(w=>assignment.requireRemembered?w.remembered:w.reviewed).length;
- const fractions=assignment.activities.map(a=>r.activities?.[a]?.done?1:a==='flashcard'?Math.min(1,flash/cardCount):0);
+ const fractions=assignment.activities.map(a=>r.activities?.[a]?.done?1:a==='flashcard'?Math.min(1,flash/Math.max(1,cardCount)):0);
  const progress=Math.floor(fractions.reduce((n,x)=>n+x,0)/fractions.length*100);
  const accuracy=r.correct+r.incorrect?Math.round(r.correct/(r.correct+r.incorrect)*100):null;
  const status=r.completedAt?'Đã hoàn thành':assignment.deadline<now?'Quá hạn':r.attempts?'Đang thực hiện':'Chưa bắt đầu';

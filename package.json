@@ -10,7 +10,9 @@
     "test:firebase": "node firebase-test.mjs",
     "dev": "node scripts/serve.mjs",
     "test:classrooms": "node classroom-test.mjs",
-    "test:profile": "node profile-test.mjs"
+    "test:profile": "node profile-test.mjs",
+    "test:grammar": "node grammar-test.mjs",
+    "test:assignment": "node assignment-test.mjs"
   },
   "engines": {
     "node": ">=22"
