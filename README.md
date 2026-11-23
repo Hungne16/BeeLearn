@@ -138,3 +138,9 @@ Trang chủ hiển thị theo vai trò đã lưu: giáo viên có lớp, tiến 
 API `dashboardGet` và `daily*` dùng token đăng nhập. Phiên được lưu riêng ở `learningSessions/<uid>` qua máy chủ; client không được đọc/ghi trực tiếp collection này. Không cần mở rộng Firestore rules. Cần Firebase Admin đã cấu hình như phần lớp học.
 
 Kiểm tra mới: `npm run test:import`, `npm run test:learning` và `npm run test:home` (lệnh cuối cần Auth/Firestore Emulator). Bộ kiểm tra bao gồm file Excel thật dạng ZIP/XML, chọn từ ôn, tiếp tục phiên, gửi lại thao tác, quyền chủ sở hữu và tính độc lập với bài tập lớp.
+
+## Hệ thống giao diện
+
+Giao diện dùng cùng màu xanh, nền sáng, thẻ viền mảnh và icon SVG cho các màn hình. Trang chủ chia nội dung chính và nhịp học/lối tắt thành hai cột trên máy tính, một cột trên điện thoại. Thanh điều hướng chính cố định; chọn bộ từ chỉ hiện khi học từ, chơi game hoặc mở thư viện. Dữ liệu và tiến độ vẫn dùng các luồng hiện có.
+
+Các stylesheet `refresh.css`, `workspace-refresh.css`, `practice-refresh.css` và `entry-refresh.css` được nạp sau CSS cũ, lần lượt phụ trách hệ thống chung/trang chủ, lớp-ngữ pháp-hồ sơ, học từ-trò chơi và trang giới thiệu-đăng nhập. Không thay kích thước vật lý hoặc cách chấm điểm trong màn chơi. Đã kiểm tra các trang với dữ liệu giả trên Firebase Emulator ở kích thước máy tính và điện thoại 390px.

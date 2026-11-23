@@ -1,0 +1,117 @@
+/* Landing and account entry: presentation only, existing authentication stays intact. */
+.public-page{max-width:1180px;padding:0 28px 24px;color:#20382b;box-sizing:border-box;font-size:16px}
+.public-header{min-height:84px;gap:24px;flex-wrap:nowrap;border-bottom:1px solid #e3e9e5}
+.public-brand{display:flex;align-items:center;gap:8px;white-space:nowrap;font-size:24px;letter-spacing:-.8px;color:#234c2d!important}
+.public-brand>span{font-size:29px;display:grid;place-items:center;background:#edf6e8;border-radius:12px;width:42px;height:42px}
+.public-header nav{gap:26px;flex-wrap:nowrap;font-size:14px;color:#637469}
+.public-header nav>a{white-space:nowrap;font-weight:650}
+.public-page a:hover{color:#3c8125}
+.public-page a:focus-visible,.bee-auth button:focus-visible{outline:3px solid #80bd56;outline-offset:4px}
+.public-page .public-primary,.public-page .public-secondary{border:1px solid #4c952b;border-bottom-width:1px;border-radius:12px;padding:13px 20px!important;box-shadow:0 2px 0 #346b1d;background:#58a832;color:#fff!important;font-size:15px;font-weight:750;line-height:1.4;text-align:center;transition:background .15s,transform .15s}
+.public-page .public-primary:hover{background:#4b952b;transform:translateY(-1px)}
+.public-page .public-secondary{background:#fff;border-color:#dce5df;color:#365d3c!important;box-shadow:none}
+.public-page .public-secondary:hover{border-color:#a9c79b;background:#f6faf3}
+.public-header .public-primary{padding:10px 17px!important;box-shadow:none}
+.public-hero{grid-template-columns:1.12fr 1fr;gap:58px;padding:64px 0 52px;min-height:0}
+.public-pill{display:inline-flex;align-items:center;gap:8px;font-size:12px;letter-spacing:.9px;font-weight:750;color:#4c852e}
+.public-hero .public-pill{padding:7px 11px;border-radius:8px;background:#edf6e7;letter-spacing:.2px;font-size:13px;text-transform:none}
+.public-hero h1{font-size:clamp(36px,4.4vw,55px);letter-spacing:-2.2px;line-height:1.15;margin:22px 0 20px;font-weight:800;color:#20382b}
+.public-hero em{color:#58a832}
+.public-hero p{font-size:17px;line-height:1.8;margin:0 0 28px;max-width:475px;color:#68786d}
+.public-hero .row{gap:12px;margin:0;flex-wrap:wrap}
+.public-hero-note{display:block;color:#7a897e;font-size:13px;margin-top:19px;line-height:1.6}
+.public-learning-preview{background:#eaf3e4;border:1px solid #dbe9d2;border-radius:26px;padding:22px;transform:rotate(2deg);position:relative;box-shadow:0 16px 40px #263e2010}
+.public-preview-label{display:flex;justify-content:space-between;gap:10px;margin:0 2px 16px;color:#6e8e60;font-weight:700;font-size:12px;letter-spacing:1.2px}
+.public-preview-label>span:last-child{font-size:20px;line-height:1}
+.public-preview-card{display:flex;flex-direction:column;align-items:center;background:#fff;border-radius:18px;padding:22px 20px 0;box-shadow:0 8px 24px #304a1810;overflow:hidden;border:1px solid #e1e9dd}
+.public-preview-tags{display:flex;justify-content:space-between;width:100%;color:#86a078;font-size:10px;font-weight:750;letter-spacing:1px}
+.public-preview-tags>span:last-child{font-size:17px}
+.public-preview-card>strong{font-size:58px;font-weight:800;letter-spacing:-1.5px;color:#254a2e;margin-top:25px;line-height:1.3}
+.public-preview-pronunciation{font-size:15px;color:#869488;margin-top:2px}
+.public-preview-meaning{display:block;font-size:20px;font-weight:650;color:#5b913f;margin:24px 0 27px}
+.public-preview-example{width:calc(100% + 40px);border-top:1px solid #edf1ea;background:#fafcf8;text-align:center;font-size:13px;color:#84927b;padding:14px 12px;box-sizing:border-box}
+.public-preview-foot{display:flex;align-items:center;gap:13px;margin:18px 4px 0;color:#4a6740}
+.public-preview-bee{font-size:39px;line-height:1.1}
+.public-preview-foot b{display:block;font-size:14px;line-height:1.5;font-weight:750}
+.public-preview-foot div>span{display:block;font-size:12px;color:#7c9171;margin-top:3px;line-height:1.6}
+.public-features{gap:15px;scroll-margin-top:30px}
+.public-features article{display:flex;align-items:flex-start;gap:15px;padding:23px 20px;border:1px solid #e1e8e2;border-radius:17px;background:#fff}
+.public-feature-icon{display:grid;place-items:center;flex:none;width:40px;height:40px;background:#edf6e7;border-radius:11px;font-size:24px;color:#609344;font-weight:700}
+.public-features article:nth-child(2) .public-feature-icon{color:#90832f;background:#f9f4dd}
+.public-features article:nth-child(3) .public-feature-icon{color:#52838d;background:#eaf3f4}
+.public-features h2{font-size:16px;line-height:1.5;margin:0 0 7px;font-weight:750;color:#2b4632;letter-spacing:-.2px}
+.public-features p{font-size:14px;line-height:1.75;color:#7a887d;margin:0}
+.public-how{padding:52px 0 44px;scroll-margin-top:30px}
+.public-how h2{font-size:29px;color:#2d4834;letter-spacing:-.7px;line-height:1.3;margin:12px 0}
+.public-how-heading>p{font-size:15px;color:#7b887f;line-height:1.75;margin:0}
+.public-steps{list-style:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:26px;margin:28px 0 26px;padding:24px 0;border-block:1px solid #e4ebe5;text-align:left}
+.public-steps li{padding:0 16px;border-right:1px solid #e4ebe5}
+.public-steps li:last-child{border-right:0}
+.public-steps b{font-size:15px;font-weight:750;color:#3d5c44}
+.public-steps p{font-size:14px;color:#7a887c;line-height:1.7;margin:7px 0 0}
+.public-footer{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:22px 0 0;border-top:1px solid #e3e9e5;font-size:13px;color:#829087}
+.public-footer>a:first-child{font-size:16px;color:#526f4d}
+.public-is-auth .public-nav-detail,.public-is-auth nav>a[href="#demo"]{display:none}
+.public-is-auth .bee-auth{margin:32px auto 24px;height:680px;max-width:1080px;border-radius:26px;box-shadow:0 12px 40px #20382b0a,0 0 0 1px #dfe8e1;color:#253e2d;background:#fff}
+.public-is-auth .bee-art{border-radius:0 48px 60px 0}
+.public-is-auth .bee-auth.is-register .bee-art{border-radius:60px 0 0 48px}
+.public-is-auth .bee-form{padding:32px 34px;gap:13px}
+.public-is-auth .bee-logo{display:none}
+.public-is-auth .bee-form h1{font-size:30px;font-weight:800;color:#23442c;letter-spacing:-.9px;margin:0 0 0;line-height:1.25}
+.public-is-auth .bee-form>p{font-size:16px;line-height:1.6;color:#758278;margin:0 0 8px}
+.public-is-auth .bee-field{min-height:49px;border:1px solid #dfe6e0;border-radius:12px;padding:0 14px;gap:11px;background:#fff;box-shadow:none}
+.public-is-auth .bee-field:focus-within{border-color:#6fa64b;box-shadow:0 0 0 3px #edf5e7}
+.public-is-auth .bee-field>svg{width:21px;height:21px;color:#8b998d}
+.public-is-auth .bee-field input{font-size:16px;color:#263e2d;padding:12px 0!important}
+.public-is-auth .bee-field input::placeholder{color:#8a978e}
+.public-is-auth .eye-toggle{min-height:38px;min-width:30px;box-shadow:none!important;border:0!important}
+.public-is-auth .eye-toggle svg{width:21px;height:21px}
+.public-is-auth .bee-options{font-size:14px;line-height:1.5;margin:1px 0 7px;flex-wrap:wrap}
+.public-is-auth .bee-options button{font-size:14px;color:#4c8e2e;font-weight:700;box-shadow:none;padding:7px 0}
+.public-is-auth .bee-options label{color:#6d7c70;gap:7px}
+.public-is-auth .bee-auth input[type=checkbox],.public-is-auth .bee-auth input[type=radio]{accent-color:#58a832;width:17px;height:17px;flex:none}
+.public-is-auth .bee-submit{background:#58a832;border:1px solid #4c932a;min-height:49px;border-radius:12px;font-size:17px;font-weight:750;box-shadow:0 2px 0 #3f7d22;gap:15px}
+.public-is-auth .bee-submit:hover{background:#4c972a}
+.public-is-auth .bee-submit>span{display:none}
+.public-is-auth .bee-google{border:1px solid #dfe6e0;border-radius:12px;min-height:45px;background:#fff;font-size:14px;color:#57705c;font-weight:650;box-shadow:none}
+.public-is-auth .bee-google:hover{background:#f7faf5;border-color:#bbcfb5}
+.public-is-auth .bee-form .auth-feedback{color:#b04938;min-height:20px;font-size:13px;line-height:1.5;margin:0;overflow-wrap:anywhere}
+.public-is-auth #beeRegister{gap:8px;padding:24px 34px}
+.public-is-auth #beeRegister h1{font-size:28px}
+.public-is-auth #beeRegister>p{font-size:15px;line-height:1.5;margin-bottom:2px}
+.public-is-auth #beeRegister .bee-field{min-height:44px}
+.public-is-auth #beeRegister .bee-field input{padding:10px 0!important}
+.public-is-auth .bee-form .password-note{font-size:13px!important;line-height:1.5!important;margin:0!important;color:#849080}
+.public-is-auth .bee-roles{font-size:14px;gap:7px 14px;margin:1px 0 4px}
+.public-is-auth .bee-roles legend{font-size:13px;color:#879284;margin-bottom:6px}
+.public-is-auth .bee-roles label{font-size:14px;color:#647664;gap:6px;line-height:1.6}
+.public-is-auth .bee-switch{background:#3f891ae8;padding:18px 10px 21px;box-sizing:border-box}
+.public-is-auth .bee-switch p{font-size:15px;margin-bottom:9px;font-weight:600}
+.public-is-auth .bee-switch button{font-size:17px;min-width:168px;min-height:43px;padding:7px 25px;border:1.5px solid #fff;border-radius:12px;font-weight:750;box-shadow:none;background:transparent}
+.public-is-auth .bee-switch button span{display:none}
+@media(max-width:1000px){.public-header nav{gap:18px}.public-hero{gap:32px}.public-features article{padding:19px 16px;gap:11px}.public-features h2{font-size:15px}.public-is-auth .bee-form{padding:27px}.public-is-auth #beeRegister{padding:24px 27px}.public-is-auth .bee-form h1{font-size:27px}.public-is-auth #beeRegister h1{font-size:26px}}
+@media(max-width:800px){.public-page{padding-inline:22px}.public-header .public-nav-detail{display:none}.public-hero{gap:28px;padding-top:42px}.public-hero h1{font-size:40px;letter-spacing:-1.4px}.public-hero p{font-size:16px}.public-preview-card>strong{font-size:50px}.public-preview-meaning{font-size:17px}.public-learning-preview{padding:17px}.public-preview-foot b{font-size:13px}.public-preview-foot div>span{font-size:11px}.public-features{gap:11px}.public-features article{flex-direction:column;gap:12px}.public-features h2{font-size:16px}.public-features p{font-size:14px}}
+@media(max-width:700px){.public-page{padding:0 18px 20px}.public-header{min-height:72px;gap:12px}.public-brand{font-size:20px;letter-spacing:-.6px;gap:6px}.public-brand>span{width:33px;height:35px;font-size:25px;border-radius:10px}.public-header nav{gap:12px;font-size:13px}.public-header nav>a[href="#demo"]{display:none}.public-header .public-primary{font-size:13px;padding:9px 12px!important;border-radius:10px}.public-hero{grid-template-columns:1fr;padding:35px 0 29px;gap:29px}.public-hero h1{font-size:40px;max-width:490px;margin:18px 0 16px;line-height:1.13}.public-hero p{font-size:16px;max-width:520px;margin-bottom:23px;line-height:1.75}.public-hero .row{gap:10px}.public-hero .public-primary,.public-hero .public-secondary{font-size:14px;padding:12px 17px!important}.public-hero-note{font-size:12px;margin-top:15px}.public-learning-preview{width:min(100%,460px);box-sizing:border-box;justify-self:center;transform:none;padding:18px;border-radius:21px}.public-preview-label{font-size:11px;margin-bottom:13px}.public-preview-card{padding-top:15px;border-radius:15px}.public-preview-tags{font-size:9px}.public-preview-card>strong{font-size:49px;margin-top:12px}.public-preview-meaning{font-size:18px;margin:16px 0 20px}.public-preview-example{padding:11px;font-size:12px}.public-preview-foot{margin-top:14px}.public-preview-foot b{font-size:13px}.public-preview-foot div>span{font-size:12px}.public-preview-bee{font-size:34px}.public-features{grid-template-columns:1fr;gap:11px}.public-features article{flex-direction:row;align-items:flex-start;padding:20px;gap:15px}.public-feature-icon{width:39px;height:39px}.public-features h2{font-size:16px;margin-bottom:5px}.public-features p{font-size:14px}.public-how{padding:34px 0 30px}.public-how h2{font-size:25px;letter-spacing:-.5px;max-width:330px;margin:12px auto}.public-how-heading>p{font-size:14px;max-width:330px;margin:auto}.public-steps{grid-template-columns:1fr;gap:18px;margin:22px 0;padding:22px 3px}.public-steps li{border:0;padding:0 8px}.public-steps b{font-size:15px}.public-steps p{font-size:14px;margin-top:4px}.public-footer{font-size:12px;gap:13px;flex-wrap:wrap}.public-footer>a:first-child{font-size:15px}.public-footer>span{display:none}.public-is-auth .public-header .public-login{display:none}.public-is-auth .bee-auth{height:810px;margin:23px 0 18px;border-radius:22px}.public-is-auth .bee-art,.public-is-auth .bee-auth.is-register .bee-art{height:160px;border-radius:0 0 32px 0}.public-is-auth .bee-scene{height:280px;width:280px;transform:translate(-38px,-46px);margin:auto}.public-is-auth .bee-switch{left:auto;right:10px;bottom:11px;width:150px;border-radius:13px;padding:8px 9px 9px;background:#3d821ae8}.public-is-auth .bee-switch p{font-size:12px;margin-bottom:6px}.public-is-auth .bee-switch button{min-width:0;font-size:14px;padding:6px 15px;min-height:34px;border-radius:8px}.public-is-auth .bee-form-panel,.public-is-auth .is-register .bee-form-panel{top:160px;height:650px}.public-is-auth .bee-form{padding:24px 22px;gap:13px;justify-content:center}.public-is-auth .bee-form h1{font-size:27px;line-height:1.25}.public-is-auth .bee-form>p{font-size:15px;line-height:1.6}.public-is-auth .bee-field input{font-size:16px}.public-is-auth .bee-options{font-size:13px;gap:7px}.public-is-auth .bee-options button{font-size:13px}.public-is-auth .bee-google{font-size:14px}.public-is-auth #beeRegister{padding:21px 22px;gap:9px}.public-is-auth #beeRegister h1{font-size:25px}.public-is-auth #beeRegister>p{font-size:14px;line-height:1.6}.public-is-auth .bee-roles label{font-size:13px}.public-is-auth .bee-form .password-note{font-size:12px!important}.public-is-auth .bee-form .auth-feedback{font-size:13px}.public-is-auth .bee-roles legend{font-size:13px}.public-is-auth .bee-roles{gap:6px 11px}}
+@media(max-width:380px){.public-brand{font-size:18px;gap:4px}.public-brand>span{font-size:24px;width:30px}.public-header nav{gap:10px}.public-header .public-login{font-size:12px}.public-header .public-primary{padding:9px 10px!important;font-size:12px}.public-hero h1{font-size:36px}.public-is-auth .bee-form{padding-inline:18px}.public-is-auth #beeRegister{padding-inline:18px}.public-is-auth .bee-options{font-size:12px}.public-is-auth .bee-options button{font-size:12px}}
+@media(prefers-reduced-motion:reduce){.public-page a{transition:none!important}.public-page .public-primary:hover{transform:none}}
+/* Keep account entry short on phones; registration gets only the space its extra fields need. */
+.public-is-auth .bee-form .password-note{color:#687b70}
+.public-is-auth .bee-roles legend{color:#687b70}
+.public-is-auth .bee-field input::placeholder{color:#738176}
+.public-is-auth .bee-form>p{color:#687b70}
+@media(max-width:700px){
+ .public-is-auth .bee-auth{height:690px}
+ .public-is-auth .bee-auth.is-register{height:810px}
+ .public-is-auth .bee-form-panel{height:530px}
+ .public-is-auth .is-register .bee-form-panel{height:650px}
+ .public-is-auth #beeLogin{padding:18px 22px;gap:9px}
+ .public-is-auth #beeLogin>p{font-size:15px;line-height:1.5;margin-bottom:4px}
+ .public-is-auth #beeLogin .bee-field{min-height:47px}
+ .public-is-auth #beeLogin .bee-field input{padding:10px 0!important}
+ .public-is-auth #beeLogin .bee-options{margin:0;gap:7px;font-size:14px}
+ .public-is-auth #beeLogin .bee-options button{font-size:14px;padding:5px 0}
+ .public-is-auth .bee-roles label{font-size:14px}
+ .public-is-auth .bee-roles legend,.public-is-auth .bee-form .password-note{font-size:13px!important}
+ .public-is-auth .bee-switch p{font-size:13px}
+}
+@media(max-width:380px){.public-is-auth #beeLogin{padding-inline:18px}.public-is-auth #beeLogin .bee-options,.public-is-auth #beeLogin .bee-options button{font-size:14px}}
