@@ -1,3 +1,4 @@
+import {skeletonHTML} from './loading.js';
 import {classroomAPI,type ClassInfo} from './classroom-client.js';
 import {dayKey,type State} from './model.js';
 import {chooseLearningPlan,type PlanLesson} from '../shared/learning-plan.js';
@@ -34,7 +35,7 @@ export function mountHome(host:HTMLElement,actions:HomeActions){
  }
  function render(){
   if(disposed)return;
-  if(loading&&!data.role&&!error){host.innerHTML='<section class="home-loading" role="status"><span>🐝</span> Đang tải góc học tập…</section>';return}
+  if(loading&&!data.role&&!error){host.innerHTML=skeletonHTML('home','Đang tải góc học tập…');return}
   const state=actions.state(),teacher=data.role==='teacher',active=data.classes.filter(c=>!c.archived&&(!c.membership||c.membership==='active')),plan=chooseLearningPlan(state.decks,state.records,lessons),due=state.decks.reduce((n,d)=>n+d.cards.filter(c=>state.records[c.id]?.reviews>0&&state.records[c.id].due<=Date.now()).length,0),reviewGrammar=lessons.filter(l=>l.progressStatus==='Cần ôn tập').length;
   const stats=teacher?[[active.length,'Lớp đang dạy','users'],[data.studentCount??0,'Học sinh','book'],[data.assignments.length,'Bài đã giao','chart']]:[[due,'Từ cần ôn','cards'],[reviewGrammar,'Chủ đề cần ôn','book'],[data.assignments.filter(a=>!a.completed).length,'Bài tập cần làm','check']];
   host.innerHTML=`<div class="home-workspace"><div class="home-welcome"><div><span class="home-eyebrow">${teacher?'KHÔNG GIAN GIẢNG DẠY':'KHÔNG GIAN HỌC TẬP'}</span><h1>Chào ${e(actions.name())}<span class="home-wave">${teacher?' ☀':' 👋'}</span></h1><p>${teacher?'Lớp học và nội dung của bạn, ngay tại đây.':'Sẵn sàng học thêm một chút hôm nay?'}</p></div><span class="home-date">${e(new Date().toLocaleDateString('vi-VN',{weekday:'long',day:'numeric',month:'long'}))}</span></div>
