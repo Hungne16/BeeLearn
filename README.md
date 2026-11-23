@@ -166,3 +166,20 @@ Mỗi bài giảng có thể kèm 3–5 câu trắc nghiệm, 4 lựa chọn/câ
 Trang chủ học sinh ưu tiên **Việc cần làm hôm nay** khi có nội dung từ lớp: lịch hôm nay, bài chưa đạt, bài tập còn thiếu/quá hạn, bài giảng cần chuẩn bị. Có nút mở trực tiếp đúng nội dung; bài đã đạt được loại khỏi danh sách, bài tập lớp vẫn có kết quả riêng. Mục tự học cá nhân vẫn giữ nguyên và thu gọn bên dưới khi đang có việc từ lớp. Các bài sắp mở hiển thị thời gian mở và không cho bắt đầu sớm.
 
 `npm run test:flow` (Auth/Firestore Emulator) kiểm tra liên kết theo lớp, mục tiêu người nhận, giữ kín đáp án, chấm điểm thật, gửi lại, phân biệt đã xem/đã đạt, đổi phiên bản, ẩn bài và thu hồi thành viên. Không cần thay Firestore rules hay dịch vụ lưu trữ. File/video tiếp tục dùng link như lựa chọn hiện tại.
+
+
+## Đánh giá học phần, phụ huynh và thông báo
+
+Trong lớp, giáo viên mở **Đánh giá & Thông báo → Kết thúc học phần** để tạo bảng nhận xét. Mỗi học sinh được đánh giá hai mục 1–5 sao (học tập và thái độ), điểm sao là trung bình hai mục. Danh sách giáo viên sắp giảm dần theo sao đã lưu. Nhận xét có bản nháp/công bố và lịch sử 20 lần sửa gần nhất. Học sinh chỉ thấy nhận xét đã công bố của chính mình tại Hồ sơ. Tạo bảng đánh giá không lưu trữ lớp và không khóa việc ôn bài.
+
+Giáo viên chọn **Mời phụ huynh**, gửi riêng mã một lần (hạn 7 ngày). Phụ huynh dùng tài khoản riêng, vào **Hồ sơ → Theo dõi con**, nhập mã; giáo viên xác nhận đúng người trước khi quyền xem có hiệu lực. Có thể thu hồi. Phụ huynh chỉ được xem nhận xét đã công bố của con ở đúng lớp được duyệt; không có quyền vào điểm hay hồ sơ của bạn khác.
+
+Lịch hiện tag xanh lá (học bình thường), đỏ (hủy lịch), vàng (học bù) ở cả hai phía. Mở buổi bị hủy → **Xếp lịch học bù**, chọn ngày giờ mới. Buổi gốc giữ nguyên, buổi bù lưu tham chiếu và ngày gốc. Chặn lịch trùng, tạo bù trùng và khôi phục buổi gốc khi buổi bù còn hiệu lực.
+
+Chuông trên thanh đầu trang có trạng thái đã đọc/chưa đọc, đi tới nội dung liên quan và đọc tất cả. Thông báo gồm bài mới (đúng người được giao), lịch mới/đổi/hủy/bù, nhắc lịch trước 24 giờ, nhận xét mới, tin giáo viên gửi cả lớp và bài quá hạn/chưa hoàn thành. Dữ liệu thông báo đọc qua API, không mở Firestore cho client. Thông báo trong web cập nhật mỗi phút khi tab hiển thị.
+
+Kiểm tra cuối bài có tùy chọn 0–180 phút (0 = không giới hạn). Đồng hồ lưu thời điểm hết giờ trên máy chủ, tiếp tục tính khi đóng tab. Hết giờ lưu **chưa hoàn thành**, không tự nộp, không chấm điểm và không gửi đáp án đúng. Một lượt làm lại mới có đồng hồ riêng; kết quả đạt từ lượt đã nộp trước đó được giữ.
+
+Workflow **Classroom notifications** kiểm tra nền mỗi 5 phút trên nhánh main, kể cả khi không ai mở web; chạy thủ công được trong GitHub Actions. Dùng hai GitHub encrypted secrets FIREBASE_ADMIN_CLIENT_EMAIL và FIREBASE_ADMIN_PRIVATE_KEY, tuyệt đối không commit thông tin xác thực. Lịch GitHub Actions có thể trễ hoặc bị tắt sau 60 ngày repository công khai không hoạt động; chuông vẫn kiểm tra bù khi người dùng mở web. Không cần bật Firebase Storage/Blaze. Đây là thông báo trong ứng dụng, chưa phải email hay thông báo đẩy của hệ điều hành.
+
+Kiểm tra bằng Auth/Firestore Emulator: npm run test:school. Kiểm thử bao gồm quyền giáo viên/học sinh/phụ huynh, nháp/công bố/lịch sử, mã dùng một lần, thu hồi liên kết, chặn chấm bài hết giờ, lịch bù, bài giao riêng, chống thông báo trùng và trạng thái đọc riêng từng người.

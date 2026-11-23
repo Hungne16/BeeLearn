@@ -1,4 +1,5 @@
 const paths:Record<string,string>={
+ bell:'<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/>',
  home:'<path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/>',
  cards:'<rect x="6" y="5" width="14" height="16" rx="3"/><path d="M3 16V5a3 3 0 0 1 3-3h10M10 10h6m-6 4h4"/>',
  book:'<path d="M12 5v16M3 4h5a4 4 0 0 1 4 2 4 4 0 0 1 4-2h5v15h-5a5 5 0 0 0-4 2 5 5 0 0 0-4-2H3z"/>',

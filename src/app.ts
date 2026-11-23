@@ -1,3 +1,4 @@
+import {bindNotifications} from './notifications.js';
 import {mountTeaching} from './teaching.js';
 import {skeletonHTML,installPageMotion} from './loading.js';
 import {mountHome} from './home.js';
@@ -50,7 +51,7 @@ function refreshNavigation(){if(demoMode||!cloudStatus.user||!cloudStatus.ready)
  const focused=document.activeElement as HTMLElement|null;const focusId=focused?.closest('#sharedHeader')?(focused.id||focused.closest('details')?.id):null;
  navigationResize.disconnect();
  target.innerHTML=navigationHTML(state,deckId,page==='study'?mode as Screen:page);
- const actions=$('navAccount');
+ bindNotifications();const actions=$('navAccount');
  const name=profileIdentity?.displayName||cloudStatus.user?.displayName?.split(' ').slice(-1)[0]||cloudStatus.user?.email?.split('@')[0]||'Tài khoản';
  actions.insertAdjacentHTML('beforeend',`<details class="nav-dropdown nav-user-menu" id="userMenu"><summary id="userMenuToggle" class="nav-account" title="${esc(name)} · ${esc(cloudStatus.label)}" aria-label="Tài khoản ${esc(name)}"><span class="nav-avatar" aria-hidden="true">${profileIdentity?.avatar?`<img src="${esc(profileIdentity.avatar)}" alt="">`:'🐝'}</span><span class="nav-account-name">${esc(name)}</span><span class="cloud-dot ${cloudStatus.label==='Đã đồng bộ'?'connected':'pending'}" aria-hidden="true"></span></summary><div class="nav-popover"><strong>Tài khoản của bạn</strong><button id="accountButton">Hồ sơ cá nhân</button><button id="accountSettings">Tài khoản & đồng bộ</button><button id="navLogout">Đăng xuất</button></div></details>`);
  for(const id of openMenus){const menu=document.getElementById(id);if(menu instanceof HTMLDetailsElement)menu.open=true}if(focusId&&!document.querySelector('dialog[open]')){const focused=$<HTMLElement>(focusId);(focused?.tagName==='DETAILS'?focused.querySelector<HTMLElement>('summary'):focused)?.focus({preventScroll:true})}

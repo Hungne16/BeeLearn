@@ -23,7 +23,7 @@ export function resultView(assignment,result,now=Date.now()){
  const fractions=assignment.activities.map(a=>r.activities?.[a]?.done?1:a==='flashcard'?Math.min(1,flash/Math.max(1,cardCount)):0);
  const progress=Math.floor(fractions.reduce((n,x)=>n+x,0)/fractions.length*100);
  const accuracy=r.correct+r.incorrect?Math.round(r.correct/(r.correct+r.incorrect)*100):null;
- const status=r.completedAt?'Đã hoàn thành':assignment.deadline<now?'Quá hạn':r.attempts?'Đang thực hiện':'Chưa bắt đầu';
+ const status=r.completedAt?'Đã hoàn thành':assignment.deadline<now?'Chưa hoàn thành':r.attempts?'Đang thực hiện':'Chưa bắt đầu';
  return {...r,progress:r.completedAt?100:progress,accuracy,status,late:!!r.completedAt&&r.completedAt>assignment.deadline};
 }
 export function applyAnswer(assignment,attempt,summary,event,now){

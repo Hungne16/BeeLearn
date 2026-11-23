@@ -17,7 +17,8 @@
     "test:learning": "node learning-plan-test.mjs",
     "test:home": "node home-session-test.mjs",
     "test:teaching": "node teaching-test.mjs",
-    "test:flow": "node learning-flow-test.mjs"
+    "test:flow": "node learning-flow-test.mjs",
+    "test:school": "node school-test.mjs"
   },
   "engines": {
     "node": ">=22"
