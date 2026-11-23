@@ -146,3 +146,13 @@ Giao diện dùng cùng màu xanh, nền sáng, thẻ viền mảnh và icon SVG
 Các stylesheet `refresh.css`, `workspace-refresh.css`, `practice-refresh.css` và `entry-refresh.css` được nạp sau CSS cũ, lần lượt phụ trách hệ thống chung/trang chủ, lớp-ngữ pháp-hồ sơ, học từ-trò chơi và trang giới thiệu-đăng nhập. Không thay kích thước vật lý hoặc cách chấm điểm trong màn chơi. Đã kiểm tra các trang với dữ liệu giả trên Firebase Emulator ở kích thước máy tính và điện thoại 390px.
 
 Cuộn và tải trang: `motion.css` mở rộng bố cục màn hình lớn, nền trang trí nhẹ, cột nhịp học bám theo trang và smooth scroll gốc của trình duyệt. `src/loading.ts` cung cấp skeleton theo màn hình, thông báo tải cho trình đọc màn hình và chuyển cảnh ngắn chỉ khi đổi màn/tải xong; không chạy lại khi gõ biểu mẫu. Chuyển động tắt theo `prefers-reduced-motion`. Không thêm độ trễ giả hoặc chặn cuộn chuột/cảm ứng.
+
+## Lịch dạy và tài liệu lớp học
+
+Giáo viên mở **Lịch dạy theo tuần** từ trang chủ hoặc danh sách lớp. Có lọc lớp, tuần trước/sau, thêm lịch đơn hoặc lặp 2/4/8/12 tuần, sửa từng buổi, đánh dấu đã dạy và hủy/khôi phục. Giờ nhập theo Việt Nam (UTC+7). Máy chủ kiểm tra trùng giờ giữa tất cả lớp của cùng giáo viên bằng transaction; buổi đã hủy giải phóng khung giờ. Học sinh xem lịch trong lớp đã tham gia, không sửa lịch.
+
+Trong lớp, **Tài liệu & Video** nhận link HTTPS của giáo trình, Drive, YouTube, Vimeo hoặc file MP4/WebM. Giáo viên đặt chương/chủ đề, thứ tự, mô tả và bản nháp/xuất bản; có sửa, ẩn và gỡ mềm. Video hỗ trợ nhúng từ YouTube/Vimeo hoặc trình phát HTML cho link file trực tiếp, luôn có link mở bản gốc. Quyền của file/video tại dịch vụ gốc phải được giáo viên cấp cho học sinh. Theo lựa chọn hiện tại, chưa dùng Firebase Storage và chưa tải file/video trực tiếp lên BeeLearning.
+
+Học sinh chỉ thấy nội dung xuất bản của lớp đang tham gia, tự đánh dấu đã học. Giáo viên xem từng học sinh đã xác nhận; đây không phải đo thời lượng xem video hay điểm kiểm tra. Thay link nội dung tạo phiên bản tiến độ mới. Chức năng này không tự hoàn thành bài tập hay tăng chuỗi học.
+
+API `teaching*` dùng cùng xác thực Firebase Admin và kiểm tra chủ lớp/thành viên. Dữ liệu nằm ở `teachingSessions` và `classrooms/<id>/resources`, client không được đọc/ghi Firestore trực tiếp. Không cần mở quyền Firestore mới. Đường dẫn `#classrooms/<id>/<tab>` giữ đúng mục đang xem sau khi tải lại. `npm run test:teaching` chạy trên Auth/Firestore Emulator, kiểm tra quyền, bản nháp, lịch trùng/lặp, gửi lại, cập nhật đồng thời, tiến độ và thu hồi tư cách thành viên.
