@@ -13,7 +13,7 @@ try{
  await assertFails(setDoc(doc(db,'classAttempts','forged'),{uid:'alice',completed:true}));
  await assertFails(setDoc(doc(db,'personalProfiles','alice'),{displayName:'forged'}));
  await assertFails(setDoc(doc(db,'profileUsernames','taken_name'),{uid:'alice'}));
- for(const path of [['grammarLessons','forged'],['grammarAttempts','forged'],['grammarProgress','alice','lessons','forged'],['learningSessions','alice','sessions','forged'],['teachingSessions','forged'],['classrooms','forged','resources','forged'],['classrooms','forged','resources','forged','progress','alice']]){await assertFails(setDoc(doc(db,...path),{uid:'alice',correct:100}));await assertFails(getDoc(doc(db,...path)));}
+ for(const path of [['grammarLessons','forged'],['grammarAttempts','forged'],['grammarProgress','alice','lessons','forged'],['learningSessions','alice','sessions','forged'],['teachingSessions','forged'],['classrooms','forged','resources','forged','quizAttempts','forged'],['classrooms','forged','resources','forged'],['classrooms','forged','resources','forged','progress','alice']]){await assertFails(setDoc(doc(db,...path),{uid:'alice',correct:100}));await assertFails(getDoc(doc(db,...path)));}
  const base=emptyState();base.decks=[{id:'deck1',name:'Day 1',description:'',cards:[{id:'c1',word:'hello',meaning:'xin chào',pos:'',ipa:'',example:'',translation:'',topic:'',related:'',language:'en-US'}]}];
  await writePatch(db,'alice',createPatch(emptyState(),base,'initial'),'device1');
  await assertSucceeds(getDoc(doc(db,'users','alice','decks','deck1')));

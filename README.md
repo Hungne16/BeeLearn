@@ -156,3 +156,13 @@ Trong lớp, **Tài liệu & Video** nhận link HTTPS của giáo trình, Drive
 Học sinh chỉ thấy nội dung xuất bản của lớp đang tham gia, tự đánh dấu đã học. Giáo viên xem từng học sinh đã xác nhận; đây không phải đo thời lượng xem video hay điểm kiểm tra. Thay link nội dung tạo phiên bản tiến độ mới. Chức năng này không tự hoàn thành bài tập hay tăng chuỗi học.
 
 API `teaching*` dùng cùng xác thực Firebase Admin và kiểm tra chủ lớp/thành viên. Dữ liệu nằm ở `teachingSessions` và `classrooms/<id>/resources`, client không được đọc/ghi Firestore trực tiếp. Không cần mở quyền Firestore mới. Đường dẫn `#classrooms/<id>/<tab>` giữ đúng mục đang xem sau khi tải lại. `npm run test:teaching` chạy trên Auth/Firestore Emulator, kiểm tra quyền, bản nháp, lịch trùng/lặp, gửi lại, cập nhật đồng thời, tiến độ và thu hồi tư cách thành viên.
+
+## Buổi học có nội dung, kiểm tra cuối bài và việc hôm nay
+
+Khi tạo/sửa một buổi trên lịch, giáo viên chọn tài liệu/video và bài tập đã có của đúng lớp. Liên kết được lưu cùng buổi học (kể cả khi lặp tuần). Học sinh mở buổi học để vào đúng bài giảng hoặc bài tập; bản nháp và bài giao riêng cho người khác được lọc trên máy chủ.
+
+Mỗi bài giảng có thể kèm 3–5 câu trắc nghiệm, 4 lựa chọn/câu, một đáp án đúng, giải thích và ngưỡng đạt do giáo viên đặt. Đáp án nằm trong tài liệu Firestore riêng tư, không gửi trong danh sách hay đề của học sinh. API chấm điểm trên máy chủ, lưu kết quả theo UID/phiên bản, xử lý gửi lại và giữ điểm tốt nhất. “Đã đọc/xem” là xác nhận cá nhân; với bài có kiểm tra, chỉ kết quả đủ điểm mới tính đạt. Đổi nội dung/link/câu hỏi/ngưỡng điểm tạo phiên bản mới và không dùng điểm cũ cho nội dung mới. Bài làm dở giữ lựa chọn trong sessionStorage của trình duyệt hiện tại theo tài khoản và phiên bản.
+
+Trang chủ học sinh ưu tiên **Việc cần làm hôm nay** khi có nội dung từ lớp: lịch hôm nay, bài chưa đạt, bài tập còn thiếu/quá hạn, bài giảng cần chuẩn bị. Có nút mở trực tiếp đúng nội dung; bài đã đạt được loại khỏi danh sách, bài tập lớp vẫn có kết quả riêng. Mục tự học cá nhân vẫn giữ nguyên và thu gọn bên dưới khi đang có việc từ lớp. Các bài sắp mở hiển thị thời gian mở và không cho bắt đầu sớm.
+
+`npm run test:flow` (Auth/Firestore Emulator) kiểm tra liên kết theo lớp, mục tiêu người nhận, giữ kín đáp án, chấm điểm thật, gửi lại, phân biệt đã xem/đã đạt, đổi phiên bản, ẩn bài và thu hồi thành viên. Không cần thay Firestore rules hay dịch vụ lưu trữ. File/video tiếp tục dùng link như lựa chọn hiện tại.
