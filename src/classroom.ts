@@ -6,7 +6,7 @@ const labels:Record<AssignmentActivity,string>={flashcard:'Học thẻ',memory:'
 const esc=(s:unknown)=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]!));
 const date=(n:number)=>new Date(n).toLocaleString('vi-VN');
 interface Actions{decks:()=>Deck[];uid:()=>string|undefined;login:()=>void;notify:(message:string)=>void;start:(session:AssignmentSession)=>void;grammar:(context:GrammarContext)=>void;createDeck:()=>void}
-export function mountClassroom(host:HTMLElement,actions:Actions,initialClassId='',invite=''){
+export function mountClassroom(host:HTMLElement,actions:Actions,initialClassId='',invite='',initialEntry?:{action?:'create'|'join'|'assign';assignmentId?:string}){
  let stopComposer=()=>{};
  let disposed=false,cid=initialClassId,detail:ClassDetail|null=null,home:Home|null=null,tab='assignments',selectedAssignment='',studentId='',refreshTimer=0,renderToken=0,requestBusy=false;
  const node=(id:string)=>host.querySelector<HTMLElement>('#'+id)!;
@@ -18,7 +18,7 @@ export function mountClassroom(host:HTMLElement,actions:Actions,initialClassId='
  }
  async function load(){const token=++renderToken;if(!actions.uid()){host.innerHTML='<section class="empty"><span class="class-icon">▤</span><h1>Lớp học</h1><p>Đăng nhập để tạo lớp hoặc nhận bài tập.</p><button class="primary" id="classLogin">Đăng nhập Google</button></section>';click('classLogin',actions.login);return}
   try{await flushClassEvents();const h=await classroomAPI<Home>('home');if(disposed||token!==renderToken)return;home=h;if(!h.profile){rolePicker();return}if(invite&&h.profile.role==='student'){joinDialog(invite);invite=''}
-   if(cid){const d=await classroomAPI<ClassDetail>('detail',{classId:cid});if(disposed||token!==renderToken)return;detail=d;renderDetail()}else renderHome();
+   if(cid){const d=await classroomAPI<ClassDetail>('detail',{classId:cid});if(disposed||token!==renderToken)return;detail=d;renderDetail()}else renderHome();const entry=initialEntry;initialEntry=undefined;if(entry?.assignmentId&&detail){selectedAssignment=entry.assignmentId;if(h.profile.role==='teacher'){tab='stats';renderDetail()}else{const a=detail.assignments.find(a=>a.id===entry.assignmentId);if(a)assignmentDialog(a)}}else if(entry?.action==='assign'&&h.profile.role==='teacher'&&detail)publishDialog();else if(entry?.action==='create'&&h.profile.role==='teacher')createClass();else if(entry?.action==='join'&&h.profile.role==='student')joinDialog();
   }catch(e){if(disposed||token!==renderToken)return;host.innerHTML=`<section class="empty"><h1>Lớp học</h1><p>${esc(error(e))}</p><div class="row"><button id="classRetry">Thử lại</button><button id="classReturn">Danh sách lớp</button></div></section>`;click('classRetry',()=>void load());click('classReturn',()=>{cid='';void load()})}
  }
  function rolePicker(){host.innerHTML=`<div class="lesson-title"><h1>Bạn sử dụng lớp học với vai trò nào?</h1></div><div class="class-role-grid"><button data-role="teacher"><span>✎</span><h2>Giáo viên</h2><p>Tạo lớp, giao bài và xem kết quả.</p></button><button data-role="student"><span>★</span><h2>Học sinh</h2><p>Tham gia lớp và làm bài tập.</p></button></div><p class="muted">Vai trò áp dụng cho lớp học. Bạn vẫn dùng đầy đủ phần học cá nhân.</p>`;host.querySelectorAll<HTMLElement>('[data-role]').forEach(b=>b.onclick=()=>void task(async()=>{await classroomAPI('setRole',{role:b.dataset.role});await load()}))}

@@ -1,0 +1,8 @@
+import assert from 'node:assert/strict';
+import {chooseLearningPlan,schedule} from './shared/learning-plan.js';
+const now=Date.now(),cards=Array.from({length:12},(_,i)=>({id:'c'+i,word:'word'+i,meaning:'nghĩa'})),decks=[{id:'d',name:'Daily routines',cards}],records={c0:{reviews:3,due:now-1000,failures:4},c1:{reviews:2,due:now+86400000,failures:0},c2:{reviews:2,due:now-2000,failures:0}};
+const lessons=[{id:'advanced',title:'Advanced',level:'C1',exerciseCounts:{quiz:4}},{id:'simple',title:'Present Simple',level:'A1',exerciseCounts:{quiz:4}}];
+let p=chooseLearningPlan(decks,records,lessons,now);assert.equal(p.cards.length,8);assert.equal(p.cards[0].id,'c0');assert(!p.cards.some(c=>c.id==='c1'));assert.equal(p.reviewCount,2);assert.equal(p.newCount,6);assert.equal(p.grammar.id,'simple');assert.equal(records.c0.reviews,3);
+const reviewed=[{...lessons[0],progressStatus:'Cần ôn tập',progress:{lastAt:now-1}}];assert.equal(chooseLearningPlan([],{},reviewed).grammar.id,'advanced');assert.equal(chooseLearningPlan([],{},lessons).cards.length,0);assert.equal(chooseLearningPlan([],{},[]).grammar,null);assert.equal(chooseLearningPlan([{...decks[0],cards:[cards[0],cards[0]]}],{},[]).cards.length,1);
+const allFuture=Object.fromEntries(cards.map(c=>[c.id,{reviews:1,due:now+86400000,failures:0}]));assert.equal(chooseLearningPlan(decks,allFuture,lessons,now).cards.length,0);assert.equal(schedule(undefined,false,now).due,now+600000);
+console.log('PASS: due-before-new selection, difficult-word priority, future words excluded, no duplicate/sample vocabulary, grammar review/level ordering and original scheduling.');

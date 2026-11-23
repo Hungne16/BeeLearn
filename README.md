@@ -126,3 +126,15 @@ Sau khi khởi động Auth/Firestore emulator với project `demo-beelearn`, ch
 ## Giao bài nhanh
 
 Giáo viên bấm **Giao bài** ngay trên thẻ lớp, chọn nội dung và hạn nộp rồi giao trực tiếp. Form tự điền tên, chọn hoạt động phù hợp và mặc định giao cả lớp; lịch, điểm tối thiểu, số lượt, người nhận riêng và các trò chơi nằm trong **Tùy chọn thêm**. Dữ liệu vẫn dùng API bài tập hiện có. `npm run test:assignment` kiểm tra mặc định, bài kết hợp, người nhận, hạn nộp và giữ snapshot bài ôn từ khó.
+
+## Trang chủ, nhập từ và buổi học hằng ngày
+
+Trang chủ hiển thị theo vai trò đã lưu: giáo viên có lớp, tiến độ bài giao và nút thêm nội dung/giao bài; người học có buổi học đề xuất, bài cần làm, ngữ pháp và thư viện cá nhân. Số liệu lấy từ tài khoản và quyền lớp hiện có; tài khoản mới không được thêm từ hay lịch sử mẫu.
+
+**Nhập từ** hỗ trợ dán bảng từ Excel/Google Sheets, CSV/TSV và file `.xlsx` nhiều trang tính. Có xem trước, chọn cột, sửa từ/nghĩa, bỏ dòng và chọn bộ đích trước khi lưu. Giới hạn file 8 MB, tối đa 500 từ mỗi bộ; dòng lỗi phải được sửa, từ trùng được bỏ qua, công thức Excel không được thực thi. File được phân tích ngay trong trình duyệt; chỉ các thẻ đã xác nhận được đồng bộ. Sao lưu JSON cũ vẫn được hỗ trợ.
+
+**Buổi học hằng ngày** ưu tiên từ khó đến hạn, thêm từ mới và một bài luyện ngữ pháp phù hợp. Có thể tải lại hoặc quay về trang chủ rồi tiếp tục đúng vị trí. Kết quả từ dùng cùng lịch ôn và chuỗi học hiện có; điểm ngữ pháp được chấm bằng API hiện có. Tự học không tự hoàn thành bài tập lớp hay đánh dấu đã đọc toàn bộ bài ngữ pháp.
+
+API `dashboardGet` và `daily*` dùng token đăng nhập. Phiên được lưu riêng ở `learningSessions/<uid>` qua máy chủ; client không được đọc/ghi trực tiếp collection này. Không cần mở rộng Firestore rules. Cần Firebase Admin đã cấu hình như phần lớp học.
+
+Kiểm tra mới: `npm run test:import`, `npm run test:learning` và `npm run test:home` (lệnh cuối cần Auth/Firestore Emulator). Bộ kiểm tra bao gồm file Excel thật dạng ZIP/XML, chọn từ ôn, tiếp tục phiên, gửi lại thao tác, quyền chủ sở hữu và tính độc lập với bài tập lớp.

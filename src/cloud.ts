@@ -42,7 +42,7 @@ export function createCloud(getState:()=>State,replace:(s:State)=>void,changed:(
   save(s:State){try{if(!user)return;if(!cache)return;const p=createPatch(baseline,s,crypto.randomUUID());baseline=clone(s);cache.state=clone(s);if(hasChanges(p))cache.queue.push(p);persist();status('Đang chờ đồng bộ');clearTimeout(timer);timer=window.setTimeout(()=>void flush(),600)}catch{notify('Không lưu được trên máy. Hãy xuất bản sao lưu JSON.')}},
   async login(){try{const provider=new GoogleAuthProvider();provider.setCustomParameters({prompt:'select_account'});await signInWithPopup(auth,provider)}catch(e){if(!String((e as {code?:string}).code).includes('popup-closed'))notify(error(e))}},
   async logout(){try{await signOut(auth)}catch(e){notify(error(e))}},
-  retry(){void flush()},async syncNow(){await flush()},
+  retry(){void flush()},async syncNow(){const owner=user?.uid,until=Date.now()+15000;while(busy){if(Date.now()>until)throw Error('Đồng bộ đang bận. Chờ một chút rồi thử lại nhé.');await new Promise(resolve=>setTimeout(resolve,30))}if(user?.uid!==owner)throw Error('Tài khoản đã đổi. Hãy mở lại trang.');await flush();if(cache?.queue.length)throw Error('Chưa đồng bộ xong bộ từ. Kiểm tra mạng rồi thử lại nhé.')},
   importGuest(){if(!user||!cache||!ready)return;const s=mergeImported(getState(),guest());replace(s);this.save(s);notify('Đã gộp dữ liệu máy này vào tài khoản.')},
  };
 }
