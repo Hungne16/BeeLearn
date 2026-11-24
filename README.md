@@ -183,3 +183,16 @@ Kiểm tra cuối bài có tùy chọn 0–180 phút (0 = không giới hạn). 
 Workflow **Classroom notifications** kiểm tra nền mỗi 5 phút trên nhánh main, kể cả khi không ai mở web; chạy thủ công được trong GitHub Actions. Dùng hai GitHub encrypted secrets FIREBASE_ADMIN_CLIENT_EMAIL và FIREBASE_ADMIN_PRIVATE_KEY, tuyệt đối không commit thông tin xác thực. Lịch GitHub Actions có thể trễ hoặc bị tắt sau 60 ngày repository công khai không hoạt động; chuông vẫn kiểm tra bù khi người dùng mở web. Không cần bật Firebase Storage/Blaze. Đây là thông báo trong ứng dụng, chưa phải email hay thông báo đẩy của hệ điều hành.
 
 Kiểm tra bằng Auth/Firestore Emulator: npm run test:school. Kiểm thử bao gồm quyền giáo viên/học sinh/phụ huynh, nháp/công bố/lịch sử, mã dùng một lần, thu hồi liên kết, chặn chấm bài hết giờ, lịch bù, bài giao riêng, chống thông báo trùng và trạng thái đọc riêng từng người.
+
+
+## Lịch trên trang chủ và sổ điểm danh
+
+Trang chủ học sinh đặt lịch học ở đầu trang, tổng hợp từ mọi lớp đang tham gia: buổi đang học, buổi tiếp theo và lịch 7 ngày tới. Thẻ có môn/lớp, giáo viên, giờ bắt đầu–kết thúc và trạng thái bình thường/hủy/bù. Link vào lớp xuất hiện từ 15 phút trước giờ học nếu giáo viên có đặt link HTTPS. Lịch tự cập nhật mỗi phút khi tab đang hiển thị và kiểm tra lại khi quay về tab; buổi đã kết thúc rời lịch sắp tới. Không hiển thị lịch của lớp đã lưu trữ hoặc thành viên bị thu hồi quyền.
+
+Dashboard giáo viên ưu tiên lịch dạy hôm nay, lớp đang dạy và bài cần theo dõi. Cột thao tác nhanh dùng một bộ chọn lớp cho giao bài, điểm danh và tài liệu/video. Nút Điểm danh trên buổi học hôm nay mở thẳng biểu mẫu của đúng buổi. Nội dung tự học không còn chiếm vùng chính của dashboard giáo viên.
+
+Trong lớp → Học sinh: danh sách có tổng ngày nghỉ, nghỉ có phép và không phép; có tìm tên và sổ theo tháng. Giáo viên chọn buổi → Điểm danh, chọn Có mặt / Nghỉ có phép / Nghỉ không phép / Chưa điểm danh, thêm ghi chú tùy chọn rồi lưu. Tất cả có mặt chỉ điền biểu mẫu, vẫn cần bấm Lưu. Không tự biến ô trống thành nghỉ. Chỉ được ghi điểm danh khi buổi đã bắt đầu, đúng giáo viên, đúng học sinh đã tham gia lớp tại buổi đó; không sửa lớp đã lưu trữ hoặc buổi đã hủy/gỡ.
+
+Một ngày có nhiều buổi nghỉ tính một ngày nghỉ; nếu trong ngày có buổi nghỉ không phép thì ngày đó thuộc nhóm không phép. Tổng số buổi từng loại cũng được giữ riêng trên máy chủ. Buổi học bù được điểm danh riêng, buổi hủy loại khỏi thống kê nhưng lịch sử điểm danh vẫn được giữ. Học sinh đã rời lớp vẫn có tên trong sổ nếu đã có ghi nhận. Sổ chỉ dành cho chủ lớp; chưa chia sẻ chuyên cần cho tài khoản học sinh/phụ huynh.
+
+Dữ liệu lưu tại teachingSessions/<id>/attendance/<uid>, đồng thời có bản tổng hợp tại classrooms/<id>/attendance. Ghi cả hai trong cùng transaction; kiểm tra revision để tránh ghi đè từ tab khác, gửi lại cùng nội dung không tạo thêm lần sửa, giữ 10 lần sửa gần nhất. Không mở thêm quyền Firestore phía client. npm run test:attendance kiểm tra quyền, lịch nhiều lớp/đang diễn ra, giờ Việt Nam, ngày tham gia lớp, cách đếm ngày, lịch hủy, gửi lại, cập nhật cũ, học sinh rời lớp và lớp lưu trữ.

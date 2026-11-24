@@ -1,3 +1,5 @@
+import {attendanceService} from './attendance-service.js';
+import {dashboardAgenda} from './agenda-service.js';
 import {randomBytes} from 'node:crypto';
 import {ensure,id,text,hash} from './classroom-domain.js';
 const rows=s=>s.docs.map(d=>({id:d.id,...d.data()}));
@@ -51,6 +53,8 @@ export function schoolService(db){
  async function ownClasses(user){const own=rows(await db.collection('classrooms').where('ownerId','==',user.uid).get());const enrolled=rows(await db.collection('classEnrollments').where('uid','==',user.uid).get()).filter(e=>e.status==='active');return [...new Set([...own.map(c=>c.id),...enrolled.map(e=>e.classId)])]}
  return async(user,action,input={})=>{
   const now=Date.now();
+  if(action.startsWith('schoolAttendance'))return attendanceService(db)(user,action,input);
+  if(action==='schoolAgenda')return dashboardAgenda(db,user);
   if(action==='schoolNotifications'){
    const classes=await ownClasses(user);await Promise.all(classes.map(cid=>auditClass(db,cid)));
    return rows(await db.collection(`schoolNotifications/${user.uid}/items`).orderBy('createdAt','desc').limit(100).get());
